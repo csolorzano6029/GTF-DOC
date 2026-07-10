@@ -1,0 +1,11 @@
+Schema: SMXFINANC
+Tables: 106
+Index rows: 892
+Foreign key rows: 4192
+Column rows: 2031
+Check constraint rows: 0
+Files:
+- c:\Users\csolo\Documents\FAVORITA\MIGRACION\docs\db2-pre\SMXFINANC_indexes.csv
+- c:\Users\csolo\Documents\FAVORITA\MIGRACION\docs\db2-pre\SMXFINANC_foreign_keys.csv
+- c:\Users\csolo\Documents\FAVORITA\MIGRACION\docs\db2-pre\SMXFINANC_columns_defaults.csv
+- c:\Users\csolo\Documents\FAVORITA\MIGRACION\docs\db2-pre\SMXFINANC_check_constraints.csv
