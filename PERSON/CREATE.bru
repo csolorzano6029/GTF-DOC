@@ -1,0 +1,28 @@
+meta {
+  name: CREATE
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{host}}/samplesServices/api/v1/persons
+  body: json
+  auth: inherit
+}
+
+headers {
+  ~Idempotency-Key: 019ecc2a-9b64-74bd-8e59-654d50fe9d55
+}
+
+body:json {
+  {
+      "documentNumber": "1715175079",
+      "firstName": "VIVIANA KATERINE",
+      "lastName": "MORENO PARRALES",
+      "email": "e@test.com"
+    }
+}
+
+settings {
+  encodeUrl: true
+}

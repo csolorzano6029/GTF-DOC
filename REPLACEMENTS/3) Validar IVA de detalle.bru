@@ -1,0 +1,22 @@
+meta {
+  name: 3) Validar IVA de detalle
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{host}}/gtfReplacementsServices/api/v1/replenishments/validate-vat
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "documentTotal": 115.0,
+    "vatValue": 15.0
+  }
+}
+
+settings {
+  encodeUrl: true
+}

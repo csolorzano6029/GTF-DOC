@@ -1,0 +1,68 @@
+meta {
+  name: 2) Buscar reposiciones por filtro
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{host}}/gtfReplacementsServices/api/v1/replenishments/findByFilter
+  body: json
+  auth: inherit
+}
+
+body:json {
+  /* {
+      "filters": [
+          {
+              "alias": null,
+              "parameterPattern": "workAreaCode",
+              "dataType": "integer",
+              "parameterValue": 156,
+              "parameterValues": [],
+              "selectedOption": "uv",
+              "operatorOR": false,
+              "comparatorTypeEnum": "Igual",
+              "insensitive": false,
+              "rangeBean": null
+          },
+          {
+              "alias": null,
+              "parameterPattern": "replenishmentStatus",
+              "dataType": "string",
+              "parameterValue": "PAG",
+              "parameterValues": [],
+              "selectedOption": "uv",
+              "operatorOR": false,
+              "comparatorTypeEnum": "Igual",
+              "insensitive": false,
+              "rangeBean": null
+          }
+      ],
+      "page": 0,
+      "size": 10
+  } */
+  
+  
+  {
+      "filters": [
+          {
+              "alias": null,
+              "parameterPattern": "replenishmentStatus",
+              "dataType": "string",
+              "parameterValue": "PEN",
+              "parameterValues": [],
+              "selectedOption": "uv",
+              "operatorOR": false,
+              "comparatorTypeEnum": "Igual",
+              "insensitive": false,
+              "rangeBean": null
+          }
+      ],
+      "page": 0,
+      "size": 10
+  }
+}
+
+settings {
+  encodeUrl: true
+}

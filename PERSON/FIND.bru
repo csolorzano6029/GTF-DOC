@@ -1,0 +1,21 @@
+meta {
+  name: FIND
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{host}}/samplesServices/api/v1/persons/find
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+      "firstName": "PEDRO"
+  }
+}
+
+settings {
+  encodeUrl: true
+}

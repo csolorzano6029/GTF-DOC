@@ -1,0 +1,23 @@
+meta {
+  name: 5) Crear reposicion (cabecera)
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{host}}/gtfReplacementsServices/api/v1/replenishments
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "workAreaCode": 187,
+    "responsiblePersonId": 72642,
+    "observation": "Nueva reposición"
+  }
+}
+
+settings {
+  encodeUrl: true
+}

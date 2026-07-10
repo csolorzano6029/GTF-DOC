@@ -1,0 +1,19 @@
+meta {
+  name: 1) Obtener cabecera de fondo
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{host}}/gtfReplacementsServices/api/v1/replenishments/current-fund?workAreaCode=101
+  body: none
+  auth: inherit
+}
+
+params:query {
+  workAreaCode: 101
+}
+
+settings {
+  encodeUrl: true
+}

@@ -1,0 +1,53 @@
+meta {
+  name: DELETE
+  type: http
+  seq: 7
+}
+
+delete {
+  url: {{host}}/samplesServices/api/v1/persons/fb5b2886-2ab6-4c41-afbc-618ba152724d
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+      "filters": [
+          {
+              "alias": null,
+              "parameterPattern": "documentNumber",
+              "dataType": "string",
+              "parameterValue": "2222222222",
+              "parameterValues": [],
+              "selectedOption": "uv",
+              "operatorOR": false,
+              "comparatorTypeEnum": "Igual",
+              "insensitive": false,
+              "rangeBean": null
+          },
+          {
+              "alias": null,
+              "parameterPattern": "createdDate",
+              "dataType": "date",
+              "parameterValue": null,
+              "parameterValues": [],
+              "selectedOption": "ra",
+              "operatorOR": false,
+              "comparatorTypeEnum": "Igual",
+              "insensitive": false,
+              "rangeBean": {
+                  "rangeStartComparatorTypeEnum": "Mayor",
+                  "rangeEndComparatorTypeEnum": "Menor",
+                  "bottomValue": 1577854800000,
+                  "topValue": 1767761999000
+              }
+          }
+      ],
+      "page": 0,
+      "size": 15
+  }
+}
+
+settings {
+  encodeUrl: true
+}

@@ -1,0 +1,22 @@
+meta {
+  name: 7) Validar documento duplicado
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{host}}/gtfReplacementsServices/api/v1/replenishments/validate-duplicate
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "taxId": "1790016919001",
+    "documentNumber": "001-001-000012345"
+  }
+}
+
+settings {
+  encodeUrl: true
+}

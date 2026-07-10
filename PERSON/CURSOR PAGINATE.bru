@@ -1,0 +1,33 @@
+meta {
+  name: CURSOR PAGINATE
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{host}}/samplesServices/api/v2/persons/cursor
+  body: json
+  auth: inherit
+}
+
+params:query {
+  ~cursorValue: 019ecd22-7e47-7197-a905-c79a6bcb959d
+}
+
+body:json {
+  /* {
+      "filters": [],
+      "page": 0,
+      "size": 15,
+      "cursor": { "createdDate": 1781886174408, "id": "019ee0ad-83d8-7bc0-8b8e-bb3cfb9cc510" }
+  } */
+  
+  {
+      "filters": [],
+      "size": 15
+  }
+}
+
+settings {
+  encodeUrl: true
+}

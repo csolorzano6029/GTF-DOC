@@ -1,0 +1,21 @@
+meta {
+  name: TOKEN
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{host}}/auth/realms/CFAVORITA-SSO-INTRANET/protocol/openid-connect/token
+  body: formUrlEncoded
+  auth: inherit
+}
+
+body:form-urlencoded {
+  grant_type: client_credentials
+  client_id: GTF-WS
+  client_secret: ehOa0pJR7SDeGoaytCaesydklk7O2JY5
+}
+
+settings {
+  encodeUrl: true
+}
