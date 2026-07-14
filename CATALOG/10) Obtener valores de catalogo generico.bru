@@ -1,0 +1,16 @@
+meta {
+  name: 10) Obtener valores de catalogo generico
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{host}}/gtfReplacementsServices/api/v1/catalogs/305/values
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

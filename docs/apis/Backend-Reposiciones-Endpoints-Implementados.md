@@ -1113,11 +1113,11 @@ Reglas de negocio aplicadas:
 
 ### Parametros
 
-| Tipo  | Nombre          | Requerido | Tipo dato | Descripcion                                                                |
-| ----- | --------------- | --------- | --------- | -------------------------------------------------------------------------- |
-| Path  | catalogTypeCode | Si        | Integer   | Codigo del tipo de catalogo (ejemplo: 303 para estado de reposicion)      |
-| Query | onlyActive      | No        | Boolean   | Si es true o null, filtra solo valores activos                            |
-| Query | numericValue    | No        | Long      | Filtra por valor numerico exacto del catalogo (`VALORNUMERICO`)           |
+| Tipo  | Nombre          | Requerido | Tipo dato | Descripcion                                                          |
+| ----- | --------------- | --------- | --------- | -------------------------------------------------------------------- |
+| Path  | catalogTypeCode | Si        | Integer   | Codigo del tipo de catalogo (ejemplo: 303 para estado de reposicion) |
+| Query | onlyActive      | No        | Boolean   | Si es true o null, filtra solo valores activos                       |
+| Query | numericValue    | No        | Long      | Filtra por valor numerico exacto del catalogo (`VALORNUMERICO`)      |
 
 ### Ejemplo de request
 

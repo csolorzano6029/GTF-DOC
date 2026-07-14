@@ -88,3 +88,33 @@ Este archivo queda como inventario incremental. Cada nuevo catalogo identificado
 - campo API impactado
 - origen legacy
 - regla de paridad migrada
+
+## 8. Catalogos legacy para frontend via endpoint /catalogs/{catalogTypeCode}/values
+
+Objetivo de esta seccion:
+
+- Listar que catalogos del flujo legacy de Reposiciones se pueden consultar con el endpoint generico de catalogos.
+- Entregar al frontend el codigo de catalogo tipo y su referencia funcional.
+
+### 8.1 Catalogos con uso directo en pantalla (legacy)
+
+| catalogTypeCode | Nombre funcional legacy | Referencia para frontend                                          | Uso en legacy (pantalla/flujo)                |
+| --------------- | ----------------------- | ----------------------------------------------------------------- | --------------------------------------------- |
+| 303             | estadoRembolso          | Estados de reposicion (filtro de busqueda y estado de solicitud)  | Combo Estado en Administracion y Revision     |
+| 305             | doucumentoTipoRembolso  | Tipos de documento de detalle (REN, NOV, RET, FAC, FEL, RTM, RTE) | Combo Tipo documento en detalle de reposicion |
+| 304             | catalogoConceptos       | Categorias de conceptos para popup de seleccion de concepto       | Popup de conceptos por area/transaccion       |
+| 28              | impuestoTipoRetencion   | Tipos de impuesto para retencion (ej. IVA, REN)                   | Popup Validar retencion                       |
+
+### 8.2 Catalogos referenciales en reposiciones (no siempre cargados como combo directo)
+
+| catalogTypeCode | Nombre funcional legacy    | Referencia para frontend                      | Observacion de uso                                                                                              |
+| --------------- | -------------------------- | --------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| 306             | movimientoRembolso         | Tipos de movimiento/transaccion de reposicion | Se usa como contexto transaccional; en legacy se resuelve principalmente por transaccion del sistema            |
+| 307             | tipoViaje                  | Tipo de viaje (gastos personales)             | Se registra en detalle (`codCatTipViaTip`), pero no se identifico carga directa de combo catalogo en este flujo |
+| 327             | catalogoConceptosDocumento | Relacion concepto-documento                   | Definido en propiedades; sin consumo directo identificado en pantallas/controladores de reposiciones revisados  |
+
+Notas para consumo frontend:
+
+1. Base endpoint: `/gtfReplacementsServices/api/v1/catalogs/{catalogTypeCode}/values`.
+2. Para paridad con legacy, priorizar `onlyActive=true` en consultas de catalogos.
+3. En `305`, excluir `-1` (No asignado) cuando se requiera replicar el comportamiento legacy del combo de tipo documento.
