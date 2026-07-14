@@ -1,0 +1,23 @@
+meta {
+  name: 1) Actualizar reposicion (cabecera)
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{host}}/gtfReplacementsServices/api/v1/replenishments/37638
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "workAreaCode": 189,
+    "observation": "Actualizacion cabecera 2"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

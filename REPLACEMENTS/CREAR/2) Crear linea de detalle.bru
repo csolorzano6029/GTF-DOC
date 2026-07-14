@@ -1,0 +1,41 @@
+meta {
+  name: 2) Crear linea de detalle
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{host}}/gtfReplacementsServices/api/v1/replenishments/34847/details
+  body: json
+  auth: inherit
+}
+
+body:json {
+  [
+    {
+      "documentType": "FAC",
+      "taxId": "1790016919001",
+      "documentNumber": "001-001-000012348",
+      "documentDate": 1783684800000,
+      "observation": "Detalle batch 1",
+      "requestedValue": 50.0,
+      "vatValue": 6.52,
+      "billingConceptSequence": 1
+    },
+    {
+      "documentType": "FAC",
+      "taxId": "1790016919001",
+      "documentNumber": "001-001-000012349",
+      "documentDate": 1783684800000,
+      "observation": "Detalle batch 2",
+      "requestedValue": 49.0,
+      "vatValue": 6.39,
+      "billingConceptSequence": 1
+    }
+  ]
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

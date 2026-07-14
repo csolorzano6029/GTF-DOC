@@ -1,0 +1,23 @@
+meta {
+  name: 3) Validar pre-check de nuevo
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{host}}/gtfReplacementsServices/api/v1/replenishments/validate-new
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "workAreaCode": 189,
+    "transactionCode": "1"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

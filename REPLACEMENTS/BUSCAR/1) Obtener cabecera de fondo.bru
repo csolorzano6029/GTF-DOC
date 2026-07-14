@@ -5,15 +5,16 @@ meta {
 }
 
 get {
-  url: {{host}}/gtfReplacementsServices/api/v1/replenishments/current-fund?workAreaCode=101
+  url: {{host}}/gtfReplacementsServices/api/v1/replenishments/current-fund?workAreaCode=2920
   body: none
   auth: inherit
 }
 
 params:query {
-  workAreaCode: 101
+  workAreaCode: 2920
 }
 
 settings {
   encodeUrl: true
+  timeout: 0
 }

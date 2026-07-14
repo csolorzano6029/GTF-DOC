@@ -1,0 +1,30 @@
+meta {
+  name: 2) Editar linea de detalle
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{host}}/gtfReplacementsServices/api/v1/replenishments/37638/details/733541
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "documentType": "FAC",
+    "taxId": "1790016919001",
+    "documentNumber": "001-001-000012346",
+    "documentDate": 1782968399000,
+    "observation": "Compra de insumos - ajuste",
+    "requestedValue": 21.00,
+    "vatValue": 2.74,
+    "billingConceptSequence": 1,
+    "fileName": "factura-001-ajustada.pdf"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
