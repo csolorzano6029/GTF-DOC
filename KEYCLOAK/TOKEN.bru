@@ -19,3 +19,27 @@ body:form-urlencoded {
 settings {
   encodeUrl: true
 }
+
+docs {
+  ## Objetivo
+  Obtener `access_token` de Keycloak para autorizar llamadas a APIs.
+
+  ## Pantalla Front
+  No aplica de forma directa a una pantalla funcional; es autenticacion tecnica.
+
+  ## Parametros
+  - Form `grant_type`: `client_credentials`.
+  - Form `client_id`: cliente Keycloak.
+  - Form `client_secret`: secreto del cliente.
+
+  ## Respuesta esperada
+  Objeto OAuth2 con token y metadatos (`access_token`, `token_type`, `expires_in`).
+
+  ## Mapeo de campos API -> pantalla Front
+  - `access_token` -> variable de autorizacion para Bruno/Front (`Authorization: Bearer ...`).
+  - `token_type` -> prefijo de autenticacion (`Bearer`).
+  - `expires_in` -> control de renovacion de sesion tecnica.
+
+  ## Nota
+  Recomendado mover `client_secret` a variable segura de entorno.
+}

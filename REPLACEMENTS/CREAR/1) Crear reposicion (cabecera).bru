@@ -23,3 +23,28 @@ settings {
   encodeUrl: true
   timeout: 0
 }
+
+docs {
+  ## Objetivo
+  Crear una reposicion de cabecera en estado pendiente.
+
+  ## Pantalla Front
+  Administracion de Reposiciones -> Formulario cabecera -> Nueva reposicion.
+
+  ## Parametros
+  - `workAreaCode` (obligatorio).
+  - `observation` (obligatorio).
+  - `responsiblePersonId` o `responsiblePersonDocument`.
+  - `transactionCode` opcional (`1`/`2`, default `1`).
+
+  ## Respuesta esperada
+  Cabecera creada con datos enriquecidos de local/responsable y estado pendiente.
+
+  ## Mapeo de campos API -> pantalla Front
+  - `message` -> toast de resultado (Creado o validacion funcional).
+  - `data.replenishmentId` -> id generado para continuar flujo.
+  - `data.workAreaCode` + `data.workAreaName` -> Local en formulario.
+  - `data.responsiblePersonId` + `data.responsiblePersonDocument` -> Responsable.
+  - `data.replenishmentStatus` + `data.replenishmentStatusName` -> estado inicial.
+  - `data.observation` -> observacion persistida.
+}

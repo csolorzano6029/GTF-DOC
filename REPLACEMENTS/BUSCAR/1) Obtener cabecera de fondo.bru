@@ -18,3 +18,27 @@ settings {
   encodeUrl: true
   timeout: 0
 }
+
+docs {
+  ## Objetivo
+  Consultar cabecera financiera del local para operar reposiciones.
+
+  ## Pantalla Front
+  Administracion de Reposiciones -> Cabecera de fondo -> Refrescar.
+
+  ## Parametros
+  - Query `workAreaCode` (obligatorio): codigo de local/area.
+
+  ## Respuesta esperada
+  Datos de fondo y estado operativo (`assignedFund`, `cashBalance`, `pendingPaymentAmount`, umbrales y estado).
+
+  ## Mapeo de campos API -> pantalla Front
+  - `workAreaCode` + `workAreaName` -> Local (codigo + nombre).
+  - `assignedFund` -> Fondo asignado.
+  - `cashBalance` -> Saldo efectivo.
+  - `pendingPaymentAmount` -> Reposiciones pendientes.
+  - `usagePercentage` -> Porcentaje de uso.
+  - `alertPercentage` -> Porcentaje de alerta.
+  - `maxDocumentValue` -> Valor maximo por documento.
+  - `currentStatus` -> Estado operativo actual del local.
+}

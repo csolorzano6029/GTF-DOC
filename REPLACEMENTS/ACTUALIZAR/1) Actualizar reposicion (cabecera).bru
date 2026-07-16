@@ -21,3 +21,26 @@ settings {
   encodeUrl: true
   timeout: 0
 }
+
+docs {
+  ## Objetivo
+  Actualizar datos de cabecera de una reposicion en estado pendiente.
+
+  ## Pantalla Front
+  Administracion de Reposiciones -> Formulario cabecera -> Guardar cambios.
+
+  ## Parametros
+  - Path `replenishmentId` (obligatorio).
+  - Body parcial con campos editables.
+
+  ## Respuesta esperada
+  Cabecera actualizada con valores consolidados por backend.
+
+  ## Mapeo de campos API -> pantalla Front
+  - `message` -> confirmacion o validacion funcional.
+  - `data.replenishmentId` -> cabecera en edicion.
+  - `data.workAreaCode` + `data.workAreaName` -> local actualizado.
+  - `data.observation` -> observacion final.
+  - `data.replenishmentStatus` + `data.replenishmentStatusName` -> estado vigente.
+  - `data.responsiblePersonDocument`/`data.responsiblePersonName` -> responsable visible.
+}

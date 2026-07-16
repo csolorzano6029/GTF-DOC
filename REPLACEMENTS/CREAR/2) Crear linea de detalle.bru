@@ -39,3 +39,30 @@ settings {
   encodeUrl: true
   timeout: 0
 }
+
+docs {
+  ## Objetivo
+  Crear lineas de detalle en lote para una reposicion existente.
+
+  ## Pantalla Front
+  Administracion de Reposiciones -> Tabla detalle -> Guardar varias filas.
+
+  ## Parametros
+  - Path `replenishmentId`.
+  - Body array de lineas de detalle.
+
+  ## Respuesta esperada
+  Lista de lineas registradas con ids de detalle y valores persistidos.
+
+  ## Mapeo de campos API -> pantalla Front
+  - `message` -> confirmacion de guardado o validacion funcional.
+  - `data[].detailId` -> id de fila para futuras ediciones.
+  - `data[].replenishmentId` -> referencia de cabecera.
+  - `data[].documentType`, `taxId`, `documentNumber`, `documentDate` -> columnas documentales.
+  - `data[].billingConceptSequence` -> concepto tecnico seleccionado.
+  - `data[].requestedValue` -> total de linea.
+  - `data[].vatValue` -> IVA de linea.
+
+  ## Nota
+  Si una fila falla validacion, no se persiste ninguna del lote.
+}

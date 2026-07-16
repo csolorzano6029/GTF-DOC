@@ -14,3 +14,32 @@ settings {
   encodeUrl: true
   timeout: 0
 }
+
+docs {
+  ## Objetivo
+  Consultar la cabecera de una reposicion especifica.
+
+  ## Pantalla Front
+  Administracion de Reposiciones -> Abrir reposicion (cabecera).
+
+  ## Parametros
+  - Path `replenishmentId` (obligatorio).
+
+  ## Respuesta esperada
+  Cabecera completa de la solicitud seleccionada.
+
+  ## Mapeo de campos API -> pantalla Front
+  - `replenishmentId` -> Numero de reposicion.
+  - `workAreaCode` + `workAreaName` -> Local (codigo + nombre).
+  - `transactionCode` + `replenishmentType` -> Tipo reposicion.
+  - `replenishmentStatus` + `replenishmentStatusName` -> Estado tecnico + legible.
+  - `responsiblePersonDocument` -> Registrado por (cedula).
+  - `responsiblePersonName` -> Registrado por (nombre).
+  - `observation` -> Observacion de cabecera.
+  - `requestedSubtotal`, `vatTotal`, `requestedTotal` -> Subtotal/IVA/Total.
+  - `sendAlert` -> Alerta visual de envio.
+  - `unsentDocumentsTotal` -> Documentos no enviados.
+
+  ## Nota
+  El detalle se consulta aparte en `/replenishments/{id}/details`.
+}

@@ -67,3 +67,34 @@ settings {
   encodeUrl: true
   timeout: 0
 }
+
+docs {
+  ## Objetivo
+  Buscar reposiciones para la grilla principal con filtros y paginacion.
+
+  ## Pantalla Front
+  Administracion de Reposiciones -> Lista de reposiciones -> Buscar.
+
+  ## Parametros
+  - Body `filters`: criterios SearchModelDTO.
+  - Body `page`: pagina base 0.
+  - Body `size`: tamano de pagina.
+
+  ## Valores de referencia
+  - Estados: `PEN`, `ENV`, `VAL`, `PAG`, `CHE`, `COB`, `ANU`.
+  - Comparador recomendado: `Igual`.
+
+  ## Respuesta esperada
+  `data.content` con filas de reposicion y metadatos de paginacion.
+
+  ## Mapeo de campos API -> pantalla Front
+  - `replenishmentId` -> columna Nro reposicion.
+  - `replenishmentDate`/`createdDate` -> columna Fecha reposicion.
+  - `replenishmentType` -> columna Tipo reposicion.
+  - `replenishmentStatusName` -> columna Estado (texto legible).
+  - `replenishmentStatus` -> valor tecnico para filtros/acciones.
+  - `requestedTotal` -> columna Total.
+  - `sendAlert` -> resalte visual de fila.
+  - `workAreaCode` + `workAreaName` -> local en grilla.
+  - `responsiblePersonDocument` -> Registrado por (cedula).
+}

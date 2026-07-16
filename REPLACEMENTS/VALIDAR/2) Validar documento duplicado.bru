@@ -21,3 +21,24 @@ settings {
   encodeUrl: true
   timeout: 0
 }
+
+docs {
+  ## Objetivo
+  Validar no duplicidad de documento por RUC + numero.
+
+  ## Pantalla Front
+  Administracion de Reposiciones -> Formulario detalle -> Validar duplicado.
+
+  ## Parametros
+  - `taxId`.
+  - `documentNumber`.
+
+  ## Respuesta esperada
+  Resultado con `duplicate` y `valid` para decision de UI.
+
+  ## Mapeo de campos API -> pantalla Front
+  - `data.duplicate` -> indicador directo de documento repetido.
+  - `data.valid` -> habilita/bloquea guardado de fila.
+  - `data.taxId` y `data.documentNumber` -> eco del documento evaluado.
+  - `message` -> mensaje funcional para usuario.
+}

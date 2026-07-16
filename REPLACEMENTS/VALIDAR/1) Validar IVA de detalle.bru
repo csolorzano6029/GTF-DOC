@@ -21,3 +21,24 @@ settings {
   encodeUrl: true
   timeout: 0
 }
+
+docs {
+  ## Objetivo
+  Validar IVA del documento contra la regla de calculo permitida.
+
+  ## Pantalla Front
+  Administracion de Reposiciones -> Formulario detalle -> Validar IVA.
+
+  ## Parametros
+  - `documentTotal`.
+  - `vatValue`.
+
+  ## Respuesta esperada
+  Resultado de validacion con bandera `valid` y limite `maxAllowedVat`.
+
+  ## Mapeo de campos API -> pantalla Front
+  - `data.valid` -> habilita o bloquea continuar con la fila.
+  - `data.maxAllowedVat` -> referencia para corregir IVA ingresado.
+  - `data.documentTotal` y `data.vatValue` -> eco de valores evaluados.
+  - `message` -> texto de validacion para mostrar al usuario.
+}

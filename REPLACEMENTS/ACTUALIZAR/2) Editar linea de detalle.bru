@@ -28,3 +28,27 @@ settings {
   encodeUrl: true
   timeout: 0
 }
+
+docs {
+  ## Objetivo
+  Editar una linea de detalle ya registrada.
+
+  ## Pantalla Front
+  Administracion de Reposiciones -> Tabla detalle -> Editar fila.
+
+  ## Parametros
+  - Path `replenishmentId`.
+  - Path `detailId`.
+  - Body con cambios de la linea.
+
+  ## Respuesta esperada
+  Detalle actualizado (`data`) o mensaje funcional en caso de bloqueo.
+
+  ## Mapeo de campos API -> pantalla Front
+  - `message` -> resultado de edicion (OK o regla funcional).
+  - `data.detailId` -> fila actualizada.
+  - `data.documentType`, `taxId`, `documentNumber`, `documentDate` -> campos documentales en grid.
+  - `data.saleReceipt`, `quantity`, `measurementTypeCode`, `measurementValueCode`, `fileName` -> campos complementarios.
+  - `data.billingConceptSequence` -> concepto seleccionado.
+  - `data.requestedValue`, `data.vatValue` -> valores economicos de linea.
+}
