@@ -5,7 +5,7 @@ meta {
 }
 
 get {
-  url: {{host}}/gtfReplacementsServices/api/v1/replenishments/37638/details
+  url: {{host}}/gtfReplacementsServices/api/v1/replenishments/34848/details
   body: none
   auth: inherit
 }
@@ -18,16 +18,16 @@ settings {
 docs {
   ## Objetivo
   Consultar lineas de detalle de una reposicion.
-
+  
   ## Pantalla Front
   Administracion de Reposiciones -> Tabla de detalle -> Cargar detalle.
-
+  
   ## Parametros
   - Path `replenishmentId` (obligatorio).
-
+  
   ## Respuesta esperada
   Lista `ReplenishmentDetailVo` con campos documentales, concepto y valores.
-
+  
   ## Mapeo de campos API -> pantalla Front
   - `detailId` -> secuencial de fila detalle.
   - `documentType` + `documentTypeName` -> tipo documento (codigo + etiqueta).

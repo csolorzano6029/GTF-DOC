@@ -5,7 +5,7 @@ meta {
 }
 
 post {
-  url: {{host}}/gtfReplacementsServices/api/v1/replenishments/34847/details
+  url: {{host}}/gtfReplacementsServices/api/v1/replenishments/34848/details
   body: json
   auth: inherit
 }
@@ -15,7 +15,7 @@ body:json {
     {
       "documentType": "FAC",
       "taxId": "1790016919001",
-      "documentNumber": "001-001-000012348",
+      "documentNumber": "001-001-00007234",
       "documentDate": 1783684800000,
       "observation": "Detalle batch 1",
       "requestedValue": 50.0,
@@ -25,7 +25,7 @@ body:json {
     {
       "documentType": "FAC",
       "taxId": "1790016919001",
-      "documentNumber": "001-001-000012349",
+      "documentNumber": "001-001-000072328",
       "documentDate": 1783684800000,
       "observation": "Detalle batch 2",
       "requestedValue": 49.0,
@@ -43,17 +43,17 @@ settings {
 docs {
   ## Objetivo
   Crear lineas de detalle en lote para una reposicion existente.
-
+  
   ## Pantalla Front
   Administracion de Reposiciones -> Tabla detalle -> Guardar varias filas.
-
+  
   ## Parametros
   - Path `replenishmentId`.
   - Body array de lineas de detalle.
-
+  
   ## Respuesta esperada
   Lista de lineas registradas con ids de detalle y valores persistidos.
-
+  
   ## Mapeo de campos API -> pantalla Front
   - `message` -> confirmacion de guardado o validacion funcional.
   - `data[].detailId` -> id de fila para futuras ediciones.
@@ -62,7 +62,18 @@ docs {
   - `data[].billingConceptSequence` -> concepto tecnico seleccionado.
   - `data[].requestedValue` -> total de linea.
   - `data[].vatValue` -> IVA de linea.
-
+  
   ## Nota
   Si una fila falla validacion, no se persiste ninguna del lote.
+  
+  ## Ejemplo de error por duplicado
+  ```json
+  {
+    "code": 200,
+    "message": "La carga de detalles presenta errores de validacion.",
+    "errors": [
+      "Fila 2: Ya se encuentra ingresado un documento con caracteristicas similares. Campos repetidos dentro del lote enviado: documentType=FAC, taxId=1790016919001, documentNumber=001-001-000052348."
+    ]
+  }
+  ```
 }

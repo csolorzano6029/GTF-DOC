@@ -1,0 +1,124 @@
+meta {
+  name: 4) Eliminar varias lineas de detalle
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{host}}/gtfReplacementsServices/api/v1/replenishments/37638/details/delete
+  body: json
+  auth: inherit
+}
+
+body:json {
+  [
+    733541,
+    733542,
+    733543
+  ]
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+example {
+  name: Escenario exitoso
+
+  request: {
+    url: {{host}}/gtfReplacementsServices/api/v1/replenishments/37638/details/delete
+    method: POST
+    mode: json
+    body:json: {
+      [
+        733541,
+        733542
+      ]
+    }
+  }
+
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+
+    body: {
+      type: text
+      content: '''
+        {
+          "code": 200,
+          "data": [
+            {
+              "replenishmentId": 37638,
+              "detailId": 733541,
+              "companyCode": 1
+            },
+            {
+              "replenishmentId": 37638,
+              "detailId": 733542,
+              "companyCode": 1
+            }
+          ],
+          "errors": [],
+          "message": "OK"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: Escenario con lista vacia
+
+  request: {
+    url: {{host}}/gtfReplacementsServices/api/v1/replenishments/37638/details/delete
+    method: POST
+    mode: json
+    body:json: {
+      []
+    }
+  }
+
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+
+    body: {
+      type: text
+      content: '''
+        {
+          "code": 200,
+          "errors": [],
+          "message": "Debe enviar al menos un detailId para eliminar."
+        }
+      '''
+    }
+  }
+}
+
+docs {
+  ## Objetivo
+  Eliminar varias lineas de detalle de reposicion en una sola solicitud, aplicando eliminacion logica (soft delete).
+
+  ## Pantalla Front
+  Administracion de Reposiciones -> Tabla detalle -> Eliminar varias filas.
+
+  ## Parametros
+  - Path `replenishmentId` (obligatorio): identificador de la cabecera.
+  - Body `Array<Long>` (obligatorio): coleccion de `detailId` a eliminar.
+
+  ## Respuesta esperada
+  - Exito: `message=OK` y `data` con la lista de ids eliminados logicamente.
+  - Bloqueo funcional: `message` con motivo (cabecera no pendiente, detalle inexistente o lista vacia).
+  - Nota: al finalizar, backend recalcula una sola vez los totales de cabecera con detalles activos.
+
+  ## Mapeo de campos API -> pantalla Front
+  - `message` -> toast o banner de resultado de eliminacion.
+  - `data[].replenishmentId` -> cabecera actualmente abierta en pantalla.
+  - `data[].detailId` -> filas removidas de la grilla de detalle.
+  - `errors[]` -> lista de errores tecnicos/funcionales cuando aplique.
+}

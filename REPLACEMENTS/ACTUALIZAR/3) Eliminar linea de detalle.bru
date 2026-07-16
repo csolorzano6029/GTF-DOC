@@ -1,0 +1,101 @@
+meta {
+  name: 3) Eliminar linea de detalle
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{host}}/gtfReplacementsServices/api/v1/replenishments/34848/details/691832/delete
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  ## Objetivo
+  Eliminar una linea de detalle de reposicion de forma logica (soft delete) cuando la cabecera esta en estado pendiente.
+  
+  ## Pantalla Front
+  Administracion de Reposiciones -> Tabla detalle -> Accion Eliminar fila.
+  
+  ## Parametros
+  - Path `replenishmentId` (obligatorio): identificador de la cabecera.
+  - Path `detailId` (obligatorio): identificador de la linea a eliminar.
+  - Sin body de entrada.
+  
+  ## Respuesta esperada
+  - Exito: `message=OK` y `data` con ids de la linea eliminada logicamente.
+  - Bloqueo funcional: `message` con motivo (cabecera no pendiente o detalle inexistente).
+  - Nota: la eliminacion es logica (se marca estado inactivo) y los totales de cabecera se recalculan con los detalles activos.
+  
+  ## Mapeo de campos API -> pantalla Front
+  - `message` -> toast o banner de resultado de eliminacion.
+  - `data.replenishmentId` -> cabecera actualmente abierta en pantalla.
+  - `data.detailId` -> fila removida de la grilla de detalle.
+  - `errors[]` -> lista de errores tecnicos/funcionales cuando aplique.
+}
+
+example {
+  name: Escenario exitoso
+  
+  request: {
+    url: {{host}}/gtfReplacementsServices/api/v1/replenishments/37638/details/733541/delete
+    method: POST
+    mode: none
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+        {
+          "code": 200,
+          "data": {
+            "replenishmentId": 37638,
+            "detailId": 733541,
+            "companyCode": 1
+          },
+          "errors": [],
+          "message": "OK"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: Escenario bloqueado por estado
+  
+  request: {
+    url: {{host}}/gtfReplacementsServices/api/v1/replenishments/37638/details/733541/delete
+    method: POST
+    mode: none
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+        {
+          "code": 200,
+          "errors": [],
+          "message": "Solo se puede eliminar detalle cuando la reposicion esta en estado pendiente."
+        }
+      '''
+    }
+  }
+}
