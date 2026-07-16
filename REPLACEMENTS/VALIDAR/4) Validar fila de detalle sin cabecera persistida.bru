@@ -1,0 +1,140 @@
+meta {
+  name: 4) Validar fila de detalle sin cabecera persistida
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{host}}/gtfReplacementsServices/api/v1/replenishments/details/validate-add
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "workAreaCode": 186,
+    "transactionCode": "1",
+    "detail": {
+      "documentType": "FAC",
+      "taxId": "1790016919001",
+      "documentNumber": "001-001-000099991",
+      "documentDate": 1783684800000,
+      "billingConceptSequence": 1,
+      "requestedValue": 10.0,
+      "vatValue": 1.30
+    },
+    "currentRequestedTotal": 5.0
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+example {
+  name: Escenario exitoso
+  
+  request: {
+    url: {{host}}/gtfReplacementsServices/api/v1/replenishments/details/validate-add
+    method: POST
+    mode: json
+    body:json: {
+      {
+        "workAreaCode": 186,
+        "transactionCode": "1",
+        "detail": {
+          "documentType": "FAC",
+          "taxId": "1790016919001",
+          "documentNumber": "001-001-000099991",
+          "documentDate": 1783684800000,
+          "billingConceptSequence": 1,
+          "requestedValue": 10.0,
+          "vatValue": 1.30
+        },
+        "currentRequestedTotal": 5.0
+      }
+    }
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+        {
+          "code": 200,
+          "data": {
+            "sendAlert": false,
+            "blockedByAvailableBalance": false,
+            "blockedByUsagePercentage": false,
+            "valid": true
+          },
+          "errors": [],
+          "message": "OK"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: escenario incorrecto
+  
+  request: {
+    url: {{host}}/gtfReplacementsServices/api/v1/replenishments/details/validate-add
+    method: POST
+    mode: json
+    body:json: {
+      {
+        "workAreaCode": 186,
+        "transactionCode": "1",
+        "currentRequestedTotal": 999999.99,
+        "detail": {
+          "billingConceptSequence": 1,
+          "documentType": "FAC",
+          "taxId": "1790016919001",
+          "documentNumber": "001-001-000012345",
+          "documentDate": 4102444800000,
+          "requestedValue": 1000.0,
+          "vatValue": 300.0,
+          "observation": "Prueba de validaciones internas"
+        }
+      }
+    }
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+        {
+          "code": 200,
+          "data": {
+            "sendAlert": false,
+            "blockedByAvailableBalance": true,
+            "blockedByUsagePercentage": true,
+            "valid": false
+          },
+          "errors": [
+            "La fecha del documento no puede ser mayor a la fecha actual.",
+            "El iva ingresado es mayor al calculado. Por favor revise y vuelva a ingresarlo.",
+            "El valor del detalle no puede superar el valor maximo por documento (50.00).",
+            "El valor de su detalle excede el saldo disponible del fondo de caja chica.",
+            "La presente reposicion sobrepaso el 60% del fondo asignado de $200.00. Favor realice el envio de la reposicion."
+          ],
+          "message": "La fila de detalle presenta errores de validacion."
+        }
+      '''
+    }
+  }
+}
