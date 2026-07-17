@@ -5,13 +5,13 @@ meta {
 }
 
 get {
-  url: {{host}}/gtfReplacementsServices/api/v1/replenishments/current-fund?workAreaCode=2920
+  url: {{host}}/gtfReplacementsServices/api/v1/replenishments/current-fund?workAreaCode=2921
   body: none
   auth: inherit
 }
 
 params:query {
-  workAreaCode: 2920
+  workAreaCode: 2921
 }
 
 settings {
@@ -22,16 +22,16 @@ settings {
 docs {
   ## Objetivo
   Consultar cabecera financiera del local para operar reposiciones.
-
+  
   ## Pantalla Front
   Administracion de Reposiciones -> Cabecera de fondo -> Refrescar.
-
+  
   ## Parametros
   - Query `workAreaCode` (obligatorio): codigo de local/area.
-
+  
   ## Respuesta esperada
   Datos de fondo y estado operativo (`assignedFund`, `cashBalance`, `pendingPaymentAmount`, umbrales y estado).
-
+  
   ## Mapeo de campos API -> pantalla Front
   - `workAreaCode` + `workAreaName` -> Local (codigo + nombre).
   - `assignedFund` -> Fondo asignado.

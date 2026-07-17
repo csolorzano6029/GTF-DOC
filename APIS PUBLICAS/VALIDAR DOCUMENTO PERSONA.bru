@@ -1,0 +1,21 @@
+meta {
+  name: VALIDAR DOCUMENTO PERSONA
+  type: http
+  seq: 1
+}
+
+get {
+  url: https://aplpre.favorita.ec/admLogin/api/public/person/validarNumeroDocumento?tipoNumeroDocumento=CI&numeroDocumento=1312706029
+  body: none
+  auth: inherit
+}
+
+params:query {
+  tipoNumeroDocumento: CI
+  numeroDocumento: 1312706029
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

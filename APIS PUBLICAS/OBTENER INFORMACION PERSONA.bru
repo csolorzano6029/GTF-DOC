@@ -1,0 +1,21 @@
+meta {
+  name: OBTENER INFORMACION PERSONA
+  type: http
+  seq: 2
+}
+
+get {
+  url: https://aplpre.favorita.ec/admLogin/api/public/person/findPersonByDocument?documentNumber=1312706029&documentType=CI
+  body: none
+  auth: inherit
+}
+
+params:query {
+  documentNumber: 1312706029
+  documentType: CI
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

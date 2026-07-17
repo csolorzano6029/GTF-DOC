@@ -10,12 +10,28 @@ post {
   auth: inherit
 }
 
+vars:pre-request {
+  detailDocumentNumberOne:
+  detailDocumentNumberTwo:
+}
+
+script:pre-request {
+  const documentPrefix = '001-001-';
+  const numericSeed = Number(String(Date.now()).slice(-8));
+
+  const firstDocumentNumber = `${documentPrefix}${String(numericSeed).padStart(8, '0')}`;
+  const secondDocumentNumber = `${documentPrefix}${String(numericSeed + 1).padStart(8, '0')}`;
+
+  bru.setVar('detailDocumentNumberOne', firstDocumentNumber);
+  bru.setVar('detailDocumentNumberTwo', secondDocumentNumber);
+}
+
 body:json {
   [
     {
       "documentType": "FAC",
       "taxId": "1790016919001",
-      "documentNumber": "001-001-00007234",
+      "documentNumber": "{{detailDocumentNumberOne}}",
       "documentDate": 1783684800000,
       "observation": "Detalle batch 1",
       "requestedValue": 50.0,
@@ -25,7 +41,7 @@ body:json {
     {
       "documentType": "FAC",
       "taxId": "1790016919001",
-      "documentNumber": "001-001-000072328",
+      "documentNumber": "{{detailDocumentNumberTwo}}",
       "documentDate": 1783684800000,
       "observation": "Detalle batch 2",
       "requestedValue": 49.0,
@@ -50,6 +66,7 @@ docs {
   ## Parametros
   - Path `replenishmentId`.
   - Body array de lineas de detalle.
+  - `documentNumber` se genera automaticamente en pre-request script con variables `detailDocumentNumberOne` y `detailDocumentNumberTwo`.
   
   ## Respuesta esperada
   Lista de lineas registradas con ids de detalle y valores persistidos.
@@ -72,7 +89,7 @@ docs {
     "code": 200,
     "message": "La carga de detalles presenta errores de validacion.",
     "errors": [
-      "Fila 2: Ya se encuentra ingresado un documento con caracteristicas similares. Campos repetidos dentro del lote enviado: documentType=FAC, taxId=1790016919001, documentNumber=001-001-000052348."
+      "Fila 2: Ya existe un registro con el documentNumber=001-001-000052348 en el lote enviado."
     ]
   }
   ```
