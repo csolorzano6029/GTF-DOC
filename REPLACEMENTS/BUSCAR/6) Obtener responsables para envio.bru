@@ -1,0 +1,39 @@
+meta {
+  name: 6) Obtener responsables para envio
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{host}}/gtfReplacementsServices/api/v1/replenishments/responsibles?workAreaCode=186
+  body: none
+  auth: inherit
+}
+
+params:query {
+  workAreaCode: 186
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  ## Objetivo
+  Obtener responsables de pago por ventanilla para el area de trabajo seleccionada.
+
+  ## Pantalla Front
+  Administracion de Reposiciones -> Flujo de envio -> Selector de responsable.
+
+  ## Parametros
+  - Query workAreaCode (obligatorio).
+
+  ## Respuesta esperada
+  Lista de responsables disponibles para envio.
+
+  ## Mapeo de campos API -> pantalla Front
+  - personId -> valor tecnico del responsable seleccionado.
+  - fullName -> nombre completo visible en el selector.
+  - type -> clasificacion del responsable (por ejemplo PRINCIPAL o SECUNDARIO).
+}

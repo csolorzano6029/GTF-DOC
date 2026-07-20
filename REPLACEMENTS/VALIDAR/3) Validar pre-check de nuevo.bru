@@ -12,9 +12,8 @@ post {
 
 body:json {
   {
-    "workAreaCode": 189,
-    "transactionCode": "1"
-  }    
+    "workAreaCode": 2921
+  }   
 }
 
 settings {
@@ -25,17 +24,17 @@ settings {
 docs {
   ## Objetivo
   Ejecutar prevalidaciones antes de crear una nueva reposicion.
-
+  
   ## Pantalla Front
   Administracion de Reposiciones -> Precheck de Nuevo.
-
+  
   ## Parametros
   - `workAreaCode` (obligatorio).
   - `transactionCode` (`1`/`2`, opcional).
-
+  
   ## Respuesta esperada
   Banderas de control para habilitar flujo nuevo o bloquear por regla operativa.
-
+  
   ## Mapeo de campos API -> pantalla Front
   - `data.valid` -> habilita crear nueva cabecera.
   - `data.transactionSelectionRequired` -> mostrar selector de tipo transaccion.
@@ -43,5 +42,6 @@ docs {
   - `data.issuedCheckReplenishment` -> bloqueo por cheque emitido.
   - `data.pendingReplenishment` -> bloqueo por pendiente en caja chica.
   - `data.initialFundLoadRequired` -> exigir flujo de carga inicial de fondos.
+  - `data` no incluye `fundHeader`.
   - `message` -> motivo funcional del estado.
 }

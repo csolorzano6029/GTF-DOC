@@ -1212,9 +1212,7 @@ Notas:
 {
   "code": 200,
   "message": "La fila de detalle presenta errores de validacion.",
-  "errors": [
-    "No existe la reposicion solicitada."
-  ],
+  "errors": ["No existe la reposicion solicitada."],
   "data": {
     "sendAlert": false,
     "blockedByAvailableBalance": false,
@@ -1670,6 +1668,60 @@ Notas:
 - Cuando `onlyActive` no se envia, el backend aplica filtro de activos por defecto.
 - Estados considerados activos en catalogo: `ACT`, `1`, `A`.
 - El endpoint se usa, entre otros casos, para resolver etiquetas legibles de estado en reposiciones.
+
+---
+
+## 13) Obtener responsables para envio
+
+### Resumen
+
+- Nombre: Obtener responsables por area de trabajo
+- Metodo: GET
+- URL: /gtfReplacementsServices/api/v1/replenishments/responsibles
+- URL completa sugerida: {{host}}/gtfReplacementsServices/api/v1/replenishments/responsibles?workAreaCode=186
+
+### Parametros
+
+| Tipo  | Nombre       | Requerido | Tipo dato | Descripcion                                                                |
+| ----- | ------------ | --------- | --------- | -------------------------------------------------------------------------- |
+| Query | workAreaCode | Si        | Integer   | Codigo de area de trabajo para cargar responsables de pago por ventanilla. |
+
+### Ejemplo de request
+
+```http
+GET /gtfReplacementsServices/api/v1/replenishments/responsibles?workAreaCode=186
+```
+
+### Ejemplo de response con data (200)
+
+```json
+{
+  "code": 200,
+  "message": "OK",
+  "data": [
+    {
+      "personId": 72643,
+      "fullName": "NOMBRE RESPONSABLE",
+      "type": "PRINCIPAL"
+    }
+  ]
+}
+```
+
+### Ejemplo de response sin data (200)
+
+```json
+{
+  "code": 200,
+  "message": "OK"
+}
+```
+
+Notas:
+
+- `companyCode` no se envia: se toma del token.
+- El endpoint se usa en el flujo de envio para poblar el selector de responsable.
+- La clasificacion del responsable se expone en `type` (por ejemplo `PRINCIPAL` o `SECUNDARIO`).
 
 ---
 

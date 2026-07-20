@@ -13,7 +13,7 @@ post {
 body:json {
   {
     "workAreaCode": 186,
-    "transactionCode": "1",
+    "transactionCode": "2",
     "detail": {
       "documentType": "FAC",
       "taxId": "1790016919001",
@@ -30,6 +30,31 @@ body:json {
 settings {
   encodeUrl: true
   timeout: 0
+}
+
+docs {
+  ## Objetivo
+  Prevalidar fila de detalle temporal sin cabecera persistida.
+  
+  ## Pantalla Front
+  Administracion de Reposiciones -> Tabla detalle temporal -> Agregar fila.
+  
+  ## Parametros
+  - `workAreaCode`.
+  - `transactionCode` (`1`/`2`, opcional).
+  - `currentRequestedTotal` (opcional).
+  - `detail` (objeto de linea).
+  
+  ## Respuesta esperada
+  Banderas de resultado en `data` y lista de errores de negocio en `errors` (raiz).
+  
+  ## Mapeo de campos API -> pantalla Front
+  - `data.valid` -> habilita o bloquea agregar fila temporal.
+  - `data.sendAlert` -> activar aviso de envio recomendado en UI.
+  - `data.blockedByAvailableBalance` -> bloqueo por saldo disponible.
+  - `data.blockedByUsagePercentage` -> bloqueo por porcentaje de consumo.
+  - `errors[]` -> detalle de mensajes por regla incumplida.
+  - `message` -> texto general de resultado (`OK` o validacion generica).
 }
 
 example {
@@ -137,29 +162,4 @@ example {
       '''
     }
   }
-}
-
-docs {
-  ## Objetivo
-  Prevalidar fila de detalle temporal sin cabecera persistida.
-
-  ## Pantalla Front
-  Administracion de Reposiciones -> Tabla detalle temporal -> Agregar fila.
-
-  ## Parametros
-  - `workAreaCode`.
-  - `transactionCode` (`1`/`2`, opcional).
-  - `currentRequestedTotal` (opcional).
-  - `detail` (objeto de linea).
-
-  ## Respuesta esperada
-  Banderas de resultado en `data` y lista de errores de negocio en `errors` (raiz).
-
-  ## Mapeo de campos API -> pantalla Front
-  - `data.valid` -> habilita o bloquea agregar fila temporal.
-  - `data.sendAlert` -> activar aviso de envio recomendado en UI.
-  - `data.blockedByAvailableBalance` -> bloqueo por saldo disponible.
-  - `data.blockedByUsagePercentage` -> bloqueo por porcentaje de consumo.
-  - `errors[]` -> detalle de mensajes por regla incumplida.
-  - `message` -> texto general de resultado (`OK` o validacion generica).
 }

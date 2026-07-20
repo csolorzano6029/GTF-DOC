@@ -5,7 +5,7 @@ meta {
 }
 
 post {
-  url: {{host}}/gtfReplacementsServices/api/v1/replenishments/37638/details/733541
+  url: {{host}}/gtfReplacementsServices/api/v1/replenishments/34848/details/691877
   body: json
   auth: inherit
 }
@@ -14,8 +14,8 @@ body:json {
   {
     "documentType": "FAC",
     "taxId": "1790016919001",
-    "documentNumber": "001-001-000012346",
-    "documentDate": 1782968399000,
+    "documentNumber": "001-001-000532347",
+    "documentDate": 1782968392000,
     "observation": "Compra de insumos - ajuste",
     "requestedValue": 21.00,
     "vatValue": 2.74,
@@ -32,18 +32,18 @@ settings {
 docs {
   ## Objetivo
   Editar una linea de detalle ya registrada.
-
+  
   ## Pantalla Front
   Administracion de Reposiciones -> Tabla detalle -> Editar fila.
-
+  
   ## Parametros
   - Path `replenishmentId`.
   - Path `detailId`.
   - Body con cambios de la linea.
-
+  
   ## Respuesta esperada
   Detalle actualizado (`data`) o mensaje funcional en caso de bloqueo.
-
+  
   ## Mapeo de campos API -> pantalla Front
   - `message` -> resultado de edicion (OK o regla funcional).
   - `data.detailId` -> fila actualizada.

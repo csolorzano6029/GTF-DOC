@@ -5,15 +5,16 @@ meta {
 }
 
 post {
-  url: {{host}}/gtfReplacementsServices/api/v1/replenishments/37638
+  url: {{host}}/gtfReplacementsServices/api/v1/replenishments/34848
   body: json
   auth: inherit
 }
 
 body:json {
   {
-    "workAreaCode": 189,
-    "observation": "Actualizacion cabecera 2"
+    "workAreaCode": 252,
+    "observation": "Actualizacion cabecera 2",
+    "transactionCode": "2"
   }
 }
 
@@ -25,17 +26,17 @@ settings {
 docs {
   ## Objetivo
   Actualizar datos de cabecera de una reposicion en estado pendiente.
-
+  
   ## Pantalla Front
   Administracion de Reposiciones -> Formulario cabecera -> Guardar cambios.
-
+  
   ## Parametros
   - Path `replenishmentId` (obligatorio).
   - Body parcial con campos editables.
-
+  
   ## Respuesta esperada
   Cabecera actualizada con valores consolidados por backend.
-
+  
   ## Mapeo de campos API -> pantalla Front
   - `message` -> confirmacion o validacion funcional.
   - `data.replenishmentId` -> cabecera en edicion.
