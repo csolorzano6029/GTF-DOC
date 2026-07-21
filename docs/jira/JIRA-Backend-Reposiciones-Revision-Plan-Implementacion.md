@@ -832,36 +832,36 @@ Decision vigente:
 Para historias con backend nuevo (H3-H9), usar este mapa minimo:
 
 1. Capa controller:
-  `gtf-replacements-services/src/main/java/ec/com/smx/gtf/replacements/controller/replenishment-reviews/ReplenishmentReviewController.java`
+   `gtf-replacements-services/src/main/java/ec/com/smx/gtf/replacements/controller/replenishment-reviews/ReplenishmentReviewController.java`
 2. Capa servicio/reglas:
-  `gtf-replacements-core/src/main/java/ec/com/smx/gtf/replacements/replenishment/service/`
+   `gtf-replacements-core/src/main/java/ec/com/smx/gtf/replacements/replenishment/service/`
 3. Capa repositorio/querydsl:
-  `gtf-replacements-core/src/main/java/ec/com/smx/gtf/replacements/replenishment/repository/`
+   `gtf-replacements-core/src/main/java/ec/com/smx/gtf/replacements/replenishment/repository/`
 4. Capa contratos VO/DTO:
-  `gtf-replacements-vo/src/main/java/ec/com/smx/gtf/replacements/vo/replenishment/`
+   `gtf-replacements-vo/src/main/java/ec/com/smx/gtf/replacements/vo/replenishment/`
 5. Tests controller:
-  `gtf-replacements-services/src/test/java/ec/com/smx/gtf/replacements/controller/`
+   `gtf-replacements-services/src/test/java/ec/com/smx/gtf/replacements/controller/`
 6. Tests servicio/repositorio:
-  `gtf-replacements-core/src/test/java/ec/com/smx/gtf/replacements/replenishment/`
+   `gtf-replacements-core/src/test/java/ec/com/smx/gtf/replacements/replenishment/`
 7. Documentacion obligatoria:
-  Bruno en `GTF-DOC/REPLACEMENTS-REVIEWS` + registro en `docs/apis`.
+   Bruno en `GTF-DOC/REPLACEMENTS-REVIEWS` + registro en `docs/apis`.
 
 ## 12.4 Formato de subtarea Jira (plantilla obligatoria)
 
 Usar esta plantilla para cada subtarea tecnica:
 
 1. Objetivo tecnico:
-  describir exactamente la regla o capacidad a implementar.
+   describir exactamente la regla o capacidad a implementar.
 2. Entradas:
-  payload, parametros, estado inicial y rol esperado.
+   payload, parametros, estado inicial y rol esperado.
 3. Salidas:
-  respuesta esperada, cambio de estado y side effects.
+   respuesta esperada, cambio de estado y side effects.
 4. Archivos a tocar:
-  listar rutas exactas (controller/service/repository/vo/test).
+   listar rutas exactas (controller/service/repository/vo/test).
 5. Criterios de aceptacion:
-  casos OK + casos de error + contrato `errors[]`.
+   casos OK + casos de error + contrato `errors[]`.
 6. Evidencia de cierre:
-  pruebas ejecutadas, request Bruno y actualizacion de docs/apis.
+   pruebas ejecutadas, request Bruno y actualizacion de docs/apis.
 
 ## 12.5 Checklist de ejecucion por historia (para onboarding)
 
@@ -876,18 +876,18 @@ Aplicar en cada historia E2-H1..E2-H10:
 
 ## 12.6 Matriz historia -> que tocar exactamente
 
-| Historia | Que hacer exactamente | Archivos minimos a tocar | Resultado esperado |
-| -------- | --------------------- | ------------------------ | ------------------ |
-| E2-H1 | Validar reuso de filtro shared y abrir wrapper solo si hay gap | `ReplenishmentController` (lectura), tests de contrato, Bruno shared | Evidencia de consumo H1 sin regresion |
-| E2-H2 | Validar reuso de lectura shared (cabecera/detalle) y flags operativos | `ReplenishmentController` (lectura), tests de lectura, Bruno shared | Evidencia de apertura para Revision |
-| E2-H3 | Crear endpoint de ajuste por detalle + reglas + recalculo | `ReplenishmentReviewController`, servicio de revision, repositorio de detalle, VO ajuste, tests | Ajuste persistido con auditoria y recalculo |
-| E2-H4 | Crear endpoint de validar reposicion revisada | `ReplenishmentReviewController`, servicio de validacion, tests de estado | Transicion a `VAL` con reglas de precondicion |
-| E2-H5 | Crear endpoint de anular reposicion en revision | `ReplenishmentReviewController`, servicio de anulacion, VO anulacion, tests | Anulacion con motivo obligatorio y auditoria |
-| E2-H6 | Implementar scheduler de cierre contable | job/scheduler en core, servicio de cierre, pruebas de integracion | Transicion `VAL -> PAG/CHE` idempotente |
-| E2-H7 | Reusar consulta de conceptos + crear cambio de concepto | endpoint shared de conceptos + endpoint nuevo en revision, servicio de ajuste concepto, tests | Cambio de concepto trazable por linea |
-| E2-H8 | Crear validaciones de retencion manual/electronica | endpoints de revision, VO retencion, servicio de validacion, tests | Retencion validada con control documental |
-| E2-H9 | Crear carga/reemplazo de archivo soporte | endpoint de revision, servicio de archivos, regla huella, tests | Soporte persistido con validaciones |
-| E2-H10 | Cerrar decision de alcance de Gastos Personales | Jira + documentacion funcional + trazabilidad en este MD | Decision formal aprobada y sin ambiguedad |
+| Historia | Que hacer exactamente                                                 | Archivos minimos a tocar                                                                        | Resultado esperado                            |
+| -------- | --------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| E2-H1    | Validar reuso de filtro shared y abrir wrapper solo si hay gap        | `ReplenishmentController` (lectura), tests de contrato, Bruno shared                            | Evidencia de consumo H1 sin regresion         |
+| E2-H2    | Validar reuso de lectura shared (cabecera/detalle) y flags operativos | `ReplenishmentController` (lectura), tests de lectura, Bruno shared                             | Evidencia de apertura para Revision           |
+| E2-H3    | Crear endpoint de ajuste por detalle + reglas + recalculo             | `ReplenishmentReviewController`, servicio de revision, repositorio de detalle, VO ajuste, tests | Ajuste persistido con auditoria y recalculo   |
+| E2-H4    | Crear endpoint de validar reposicion revisada                         | `ReplenishmentReviewController`, servicio de validacion, tests de estado                        | Transicion a `VAL` con reglas de precondicion |
+| E2-H5    | Crear endpoint de anular reposicion en revision                       | `ReplenishmentReviewController`, servicio de anulacion, VO anulacion, tests                     | Anulacion con motivo obligatorio y auditoria  |
+| E2-H6    | Implementar scheduler de cierre contable                              | job/scheduler en core, servicio de cierre, pruebas de integracion                               | Transicion `VAL -> PAG/CHE` idempotente       |
+| E2-H7    | Reusar consulta de conceptos + crear cambio de concepto               | endpoint shared de conceptos + endpoint nuevo en revision, servicio de ajuste concepto, tests   | Cambio de concepto trazable por linea         |
+| E2-H8    | Crear validaciones de retencion manual/electronica                    | endpoints de revision, VO retencion, servicio de validacion, tests                              | Retencion validada con control documental     |
+| E2-H9    | Crear carga/reemplazo de archivo soporte                              | endpoint de revision, servicio de archivos, regla huella, tests                                 | Soporte persistido con validaciones           |
+| E2-H10   | Cerrar decision de alcance de Gastos Personales                       | Jira + documentacion funcional + trazabilidad en este MD                                        | Decision formal aprobada y sin ambiguedad     |
 
 Notas operativas para esta matriz:
 
