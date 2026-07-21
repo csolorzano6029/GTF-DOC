@@ -5,7 +5,7 @@ meta {
 }
 
 get {
-  url: {{host}}/gtfReplacementsServices/api/v1/catalogs/2880/values
+  url: {{host}}/gtfReplacementsServices/api/v1/catalogs/303/values
   body: none
   auth: inherit
 }
@@ -18,17 +18,17 @@ settings {
 docs {
   ## Objetivo
   Obtener valores de un catalogo generico para poblar combos del Front.
-
+  
   ## Pantalla Front
   Administracion de Reposiciones -> Carga de catalogos UI (estado, tipo documento, categorias).
-
+  
   ## Parametros
   - Path `catalogTypeCode` (en este request fijo en `2880`).
   - Query opcional `onlyActive` y `numericValue`.
-
+  
   ## Respuesta esperada
   Lista de `CatalogValueVo` con codigos y etiquetas legibles para UI.
-
+  
   ## Mapeo de campos API -> pantalla Front
   - `catalogValueCode` -> valor tecnico del combo (value).
   - `catalogValueName` -> texto visible del combo (label).

@@ -52,11 +52,11 @@ Fecha de corte: 2026-07-13
 
 ### E1-H2 - Consultar cabecera del fondo del local
 
-| ID tarea | Estado     | Evidencia                                  | Nota                             |
-| -------- | ---------- | ------------------------------------------ | -------------------------------- |
-| E1-H2-T1 | Completada | ReplenishmentService.findCurrentFundHeader | Calculo de cabecera implementado |
-| E1-H2-T2 | Completada | GET /api/v1/replenishments/current-fund    | Endpoint expuesto                |
-| E1-H2-T3 | Completada | Tests de service/controller                | Cobertura vigente                |
+| ID tarea | Estado     | Evidencia                                         | Nota                             |
+| -------- | ---------- | ------------------------------------------------- | -------------------------------- |
+| E1-H2-T1 | Completada | ReplenishmentService.findCurrentFundHeader        | Calculo de cabecera implementado |
+| E1-H2-T2 | Completada | GET /api/v1/replenishment-management/current-fund | Endpoint expuesto                |
+| E1-H2-T3 | Completada | Tests de service/controller                       | Cobertura vigente                |
 
 ### E1-H3 - Listar y buscar reposiciones
 
@@ -72,18 +72,18 @@ Fecha de corte: 2026-07-13
 | -------- | ---------- | ---------------------------------------------------------------------------- | ---------------------------------------------------- |
 | E1-H4-T1 | Completada | ReplenishmentService.create + ReplenishmentHeaderValidator.validateForCreate | Regla pendiente por transaccion alineada a legacy    |
 | E1-H4-T2 | Completada | GET /api/v1/replenishments/{replenishmentId}                                 | Consulta por id implementada                         |
-| E1-H4-T3 | Completada | POST /api/v1/replenishments/{replenishmentId}                                | Update en pendiente + limpieza de totales de request |
+| E1-H4-T3 | Completada | POST /api/v1/replenishment-management/{replenishmentId}                      | Update en pendiente + limpieza de totales de request |
 | E1-H4-T4 | Completada | ReplenishmentServiceTest + ReplenishmentControllerTest                       | Casos de create/read/update en verde                 |
 
 ### E1-H5 - Gestion del detalle de documentos
 
-| ID tarea | Estado     | Evidencia                                           | Nota                                      |
-| -------- | ---------- | --------------------------------------------------- | ----------------------------------------- |
-| E1-H5-T1 | Completada | POST /api/v1/replenishments/{id}/details            | Crear detalle implementado                |
-| E1-H5-T2 | Completada | POST /api/v1/replenishments/{id}/details/{detailId} | Editar detalle implementado               |
-| E1-H5-T3 | Pendiente  | No existe endpoint delete detalle                   | Falta /details/{detailId}/delete          |
-| E1-H5-T4 | Pendiente  | No existen endpoints de catalogos de detalle        | Falta /document-types y /billing-concepts |
-| E1-H5-T5 | Parcial    | Existen pruebas create/update/findDetails           | Faltan pruebas de delete y catalogos      |
+| ID tarea | Estado     | Evidencia                                                     | Nota                                      |
+| -------- | ---------- | ------------------------------------------------------------- | ----------------------------------------- |
+| E1-H5-T1 | Completada | POST /api/v1/replenishment-management/{id}/details            | Crear detalle implementado                |
+| E1-H5-T2 | Completada | POST /api/v1/replenishment-management/{id}/details/{detailId} | Editar detalle implementado               |
+| E1-H5-T3 | Pendiente  | No existe endpoint delete detalle                             | Falta /details/{detailId}/delete          |
+| E1-H5-T4 | Pendiente  | No existen endpoints de catalogos de detalle                  | Falta /document-types y /billing-concepts |
+| E1-H5-T5 | Parcial    | Existen pruebas create/update/findDetails                     | Faltan pruebas de delete y catalogos      |
 
 ### E1-H6 - Validaciones de negocio del ingreso
 
@@ -106,19 +106,19 @@ Fecha de corte: 2026-07-13
 
 ### E1-H8 - Enviar reposicion a contabilidad
 
-| ID tarea | Estado    | Evidencia                                   | Nota                                 |
-| -------- | --------- | ------------------------------------------- | ------------------------------------ |
-| E1-H8-T1 | Pendiente | Sin GET /api/v1/replenishments/responsibles | Consulta de responsables pendiente   |
-| E1-H8-T2 | Pendiente | Sin POST /api/v1/replenishments/{id}/send   | Cambio de estado a enviado pendiente |
-| E1-H8-T3 | Pendiente | Sin pruebas de envio                        | Cobertura pendiente                  |
+| ID tarea | Estado    | Evidencia                                           | Nota                                 |
+| -------- | --------- | --------------------------------------------------- | ------------------------------------ |
+| E1-H8-T1 | Pendiente | Sin GET /api/v1/replenishments/responsibles         | Consulta de responsables pendiente   |
+| E1-H8-T2 | Pendiente | Sin POST /api/v1/replenishment-management/{id}/send | Cambio de estado a enviado pendiente |
+| E1-H8-T3 | Pendiente | Sin pruebas de envio                                | Cobertura pendiente                  |
 
 ### E1-H9 - Anular e imprimir reposicion
 
-| ID tarea | Estado    | Evidencia                                   | Nota                         |
-| -------- | --------- | ------------------------------------------- | ---------------------------- |
-| E1-H9-T1 | Pendiente | Sin POST /api/v1/replenishments/{id}/cancel | Flujo de anulacion pendiente |
-| E1-H9-T2 | Pendiente | Sin GET /api/v1/replenishments/{id}/print   | Flujo de impresion pendiente |
-| E1-H9-T3 | Pendiente | Sin pruebas de anulacion/impresion          | Cobertura pendiente          |
+| ID tarea | Estado    | Evidencia                                             | Nota                         |
+| -------- | --------- | ----------------------------------------------------- | ---------------------------- |
+| E1-H9-T1 | Pendiente | Sin POST /api/v1/replenishment-management/{id}/cancel | Flujo de anulacion pendiente |
+| E1-H9-T2 | Pendiente | Sin GET /api/v1/replenishment-management/{id}/print   | Flujo de impresion pendiente |
+| E1-H9-T3 | Pendiente | Sin pruebas de anulacion/impresion                    | Cobertura pendiente          |
 
 ---
 

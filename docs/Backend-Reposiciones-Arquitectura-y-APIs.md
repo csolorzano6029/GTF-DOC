@@ -82,34 +82,34 @@ gtf-replacements-root
 
 # MÓDULO 1 — Administración de Reposiciones (local)
 
-**Módulo backend:** `replenishment` · **Base:** `/gtfReplacementsServices/api/v1/replenishments`
+**Módulo backend:** `replenishment` · **Base compartida:** `/gtfReplacementsServices/api/v1/replenishments` · **Base administracion:** `/gtfReplacementsServices/api/v1/replenishment-management` · **Base revision:** `/gtfReplacementsServices/api/v1/replenishment-reviews`
 **Origen legacy:** `AdminRembolsoController` + `AdminRembolsoDataManager` + `IReposicionServicio`.
 
 ## 1.1 CRUD y operaciones
 
-| #   | Método | Ruta                              | Descripción                                              |
-| --- | ------ | --------------------------------- | -------------------------------------------------------- |
-| 1   | GET    | `/current-fund?workAreaCode=`     | Cabecera del fondo (asignado, saldo, pendientes).        |
-| 2   | POST   | `/findByFilter`                   | Búsqueda paginada.                                       |
-| 3   | GET    | `/{id}`                           | Ver reposición + detalle.                                |
-| 4   | POST   | ``                                | Crear (estado `PENDING`).                                |
-| 5   | POST   | `/{id}`                           | Actualizar cabecera.                                     |
-| 6   | POST   | `/{id}/details`                   | Agregar línea de documento.                              |
-| 7   | POST   | `/{id}/details/{detailId}`        | Editar línea.                                            |
-| 8   | POST   | `/{id}/details/{detailId}/delete` | Eliminar línea.                                          |
-| 9   | GET    | `/document-types`                 | Catálogo de tipos de documento.                          |
-| 10  | GET    | `/billing-concepts?type=LC\|LO`   | Conceptos (consumidos del SIF).                          |
-| 11  | POST   | `/validate-vat`                   | Validar/calcular IVA.                                    |
-| 12  | POST   | `/validate-duplicate`             | Validar documento no duplicado.                          |
-| 13  | GET    | `/responsibles?workAreaCode=`     | Responsables del local.                                  |
-| 14  | POST   | `/{id}/send`                      | Enviar a contabilidad (`SENT`).                          |
-| 15  | POST   | `/{id}/cancel`                    | Anular.                                                  |
-| 16  | GET    | `/{id}/print`                     | PDF de la reposición.                                    |
-| 17  | —      | `/withholdings/*`                 | Retenciones electrónica/manual (depende SRI — al final). |
+| #   | Método | Ruta                                                       | Descripción                                              |
+| --- | ------ | ---------------------------------------------------------- | -------------------------------------------------------- |
+| 1   | GET    | `/replenishment-management/current-fund?workAreaCode=`     | Cabecera del fondo (asignado, saldo, pendientes).        |
+| 2   | POST   | `/replenishments/findByFilter`                             | Búsqueda paginada.                                       |
+| 3   | GET    | `/replenishments/{id}`                                     | Ver reposición + detalle.                                |
+| 4   | POST   | `/replenishment-management`                                | Crear (estado `PENDING`).                                |
+| 5   | POST   | `/replenishment-management/{id}`                           | Actualizar cabecera.                                     |
+| 6   | POST   | `/replenishment-management/{id}/details`                   | Agregar línea de documento.                              |
+| 7   | POST   | `/replenishment-management/{id}/details/{detailId}`        | Editar línea.                                            |
+| 8   | POST   | `/replenishment-management/{id}/details/{detailId}/delete` | Eliminar línea.                                          |
+| 9   | GET    | `/replenishments/document-types`                           | Catálogo de tipos de documento.                          |
+| 10  | GET    | `/replenishments/billing-concepts?type=LC\|LO`             | Conceptos (consumidos del SIF).                          |
+| 11  | POST   | `/replenishments/validate-vat`                             | Validar/calcular IVA.                                    |
+| 12  | POST   | `/replenishments/validate-duplicate`                       | Validar documento no duplicado.                          |
+| 13  | GET    | `/replenishments/responsibles?workAreaCode=`               | Responsables del local.                                  |
+| 14  | POST   | `/replenishment-management/{id}/send`                      | Enviar a contabilidad (`SENT`).                          |
+| 15  | POST   | `/replenishment-management/{id}/cancel`                    | Anular.                                                  |
+| 16  | GET    | `/replenishment-management/{id}/print`                     | PDF de la reposición.                                    |
+| 17  | —      | `/withholdings/*`                                          | Retenciones electrónica/manual (depende SRI — al final). |
 
 ## 1.2 Payloads / Responses
 
-**GET `/current-fund?workAreaCode=186`**
+**GET `/replenishment-management/current-fund?workAreaCode=186`**
 
 ```json
 {
@@ -128,7 +128,7 @@ gtf-replacements-root
 }
 ```
 
-**POST `/findByFilter`**
+**POST `/replenishments/findByFilter`**
 
 ```json
 // request
@@ -140,7 +140,7 @@ gtf-replacements-root
             "totalElements": 2, "totalPages": 1, "number": 0, "size": 10 } }
 ```
 
-**GET `/{id}`**
+**GET `/replenishments/{id}`**
 
 ```json
 {
@@ -171,7 +171,7 @@ gtf-replacements-root
 }
 ```
 
-**POST `` (crear)**
+**POST `/replenishment-management` (crear)**
 
 ```json
 // request
@@ -180,7 +180,7 @@ gtf-replacements-root
 { "code": 409, "message": "Ya existe una reposición pendiente para el local.", "data": null }
 ```
 
-**POST `/{id}/details` (factura)**
+**POST `/replenishment-management/{id}/details` (factura)**
 
 ```json
 // request
@@ -191,7 +191,7 @@ gtf-replacements-root
 { "code": 0, "message": "OK", "data": { "detailId": 1, "requestedValue": 2.00 } }
 ```
 
-**POST `/validate-vat`**
+**POST `/replenishments/validate-vat`**
 
 ```json
 // request
@@ -201,7 +201,7 @@ gtf-replacements-root
   "data": { "total": 2.00, "calculatedVat": 0.26, "maxAllowedVat": 0.26, "valid": false } }
 ```
 
-**POST `/validate-duplicate`**
+**POST `/replenishments/validate-duplicate`**
 
 ```json
 // request
@@ -211,7 +211,7 @@ gtf-replacements-root
   "data": { "duplicate": true, "replenishmentId": 4890010, "workAreaCode": "186", "cancelledDate": "2026-06-29" } }
 ```
 
-**GET `/document-types`**
+**GET `/replenishments/document-types`**
 
 ```json
 {
@@ -225,7 +225,7 @@ gtf-replacements-root
 }
 ```
 
-**GET `/responsibles?workAreaCode=186`**
+**GET `/replenishments/responsibles?workAreaCode=186`**
 
 ```json
 {
@@ -242,7 +242,7 @@ gtf-replacements-root
 }
 ```
 
-**POST `/{id}/send`**
+**POST `/replenishment-management/{id}/send`**
 
 ```json
 // request
@@ -251,7 +251,7 @@ gtf-replacements-root
 { "code": 422, "message": "No existe un responsable asignado para el local.", "data": null }
 ```
 
-**POST `/{id}/cancel`**
+**POST `/replenishment-management/{id}/cancel`**
 
 ```json
 { "observation": "Documento ingresado por error" }

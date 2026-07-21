@@ -21,7 +21,7 @@ Este archivo se actualiza cada vez que se crea o modifica un endpoint.
 
 - Modulo: replenishments + catalogs (generico)
 - Base URL aplicacion: /gtfReplacementsServices
-- Base path controllers: /api/v1/replenishments y /api/v1/catalogs
+- Base path controllers: /api/v1/replenishments (compartido), /api/v1/replenishment-management (administracion), /api/v1/replenishment-reviews (revision) y /api/v1/catalogs
 
 ## Convenciones de respuesta
 
@@ -50,7 +50,7 @@ Notas:
 
 - Nombre: Obtener cabecera de fondo por area de trabajo
 - Metodo: GET
-- URL: /gtfReplacementsServices/api/v1/replenishments/current-fund
+- URL: /gtfReplacementsServices/api/v1/replenishment-management/current-fund
 
 ### Parametros
 
@@ -61,7 +61,7 @@ Notas:
 ### Ejemplo de request
 
 ```http
-GET /gtfReplacementsServices/api/v1/replenishments/current-fund?workAreaCode=186
+GET /gtfReplacementsServices/api/v1/replenishment-management/current-fund?workAreaCode=186
 ```
 
 ### Ejemplo de response con data
@@ -626,8 +626,8 @@ Notas:
 
 - Nombre: Crear reposicion en estado pendiente
 - Metodo: POST
-- URL: /gtfReplacementsServices/api/v1/replenishments
-- URL completa sugerida: {{host}}/gtfReplacementsServices/api/v1/replenishments
+- URL: /gtfReplacementsServices/api/v1/replenishment-management
+- URL completa sugerida: {{host}}/gtfReplacementsServices/api/v1/replenishment-management
 
 ### Request payload minimo (obligatorio base)
 
@@ -786,8 +786,8 @@ Aclaracion sobre totales en create de cabecera:
 
 - Nombre: Actualizar cabecera de reposicion
 - Metodo: POST
-- URL: /gtfReplacementsServices/api/v1/replenishments/{replenishmentId}
-- URL completa sugerida: {{host}}/gtfReplacementsServices/api/v1/replenishments/1
+- URL: /gtfReplacementsServices/api/v1/replenishment-management/{replenishmentId}
+- URL completa sugerida: {{host}}/gtfReplacementsServices/api/v1/replenishment-management/1
 
 ### Parametros
 
@@ -935,8 +935,8 @@ Notas:
 
 - Nombre: Validar reglas previas para habilitar nuevo flujo de reposicion
 - Metodo: POST
-- URL: /gtfReplacementsServices/api/v1/replenishments/validate-new
-- URL completa sugerida: {{host}}/gtfReplacementsServices/api/v1/replenishments/validate-new
+- URL: /gtfReplacementsServices/api/v1/replenishment-management/validate-new
+- URL completa sugerida: {{host}}/gtfReplacementsServices/api/v1/replenishment-management/validate-new
 
 ### Request payload
 
@@ -1351,7 +1351,7 @@ Ejemplo:
 
 ### Nota de contrato
 
-El endpoint `POST /gtfReplacementsServices/api/v1/replenishments/{replenishmentId}/details` se consolidó para recibir lotes de detalle (array JSON).
+El endpoint `POST /gtfReplacementsServices/api/v1/replenishment-management/{replenishmentId}/details` se consolidó para recibir lotes de detalle (array JSON).
 
 Para request/response completos del contrato vigente, usar la sección siguiente.
 
@@ -1363,8 +1363,8 @@ Para request/response completos del contrato vigente, usar la sección siguiente
 
 - Nombre: Crear multiples lineas de detalle para una reposicion en una sola solicitud
 - Metodo: POST
-- URL: /gtfReplacementsServices/api/v1/replenishments/{replenishmentId}/details
-- URL completa sugerida: {{host}}/gtfReplacementsServices/api/v1/replenishments/{replenishmentId}/details
+- URL: /gtfReplacementsServices/api/v1/replenishment-management/{replenishmentId}/details
+- URL completa sugerida: {{host}}/gtfReplacementsServices/api/v1/replenishment-management/{replenishmentId}/details
 
 ### Parametros
 
@@ -1519,8 +1519,8 @@ Notas:
 
 - Nombre: Editar linea de detalle para una reposicion
 - Metodo: POST
-- URL: /gtfReplacementsServices/api/v1/replenishments/{replenishmentId}/details/{detailId}
-- URL completa sugerida: {{host}}/gtfReplacementsServices/api/v1/replenishments/{replenishmentId}/details/{detailId}
+- URL: /gtfReplacementsServices/api/v1/replenishment-management/{replenishmentId}/details/{detailId}
+- URL completa sugerida: {{host}}/gtfReplacementsServices/api/v1/replenishment-management/{replenishmentId}/details/{detailId}
 
 ### Parametros
 

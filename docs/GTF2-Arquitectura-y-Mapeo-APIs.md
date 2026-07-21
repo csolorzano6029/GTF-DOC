@@ -221,32 +221,34 @@ Extraídas de `IReposicionServicio` y `AdminRembolsoController`:
 
 ### 6.2 Endpoints REST a desarrollar
 
-Base: `/api/v1/replenishments`
+Base compartida (lectura/validaciones): `/api/v1/replenishments`
+Base administracion (mutaciones): `/api/v1/replenishment-management`
+Base revision (contabilidad): `/api/v1/replenishment-reviews`
 
-| #   | Método | Ruta                                           | Descripción                                       | Origen legacy                              |
-| --- | ------ | ---------------------------------------------- | ------------------------------------------------- | ------------------------------------------ |
-| 1   | `GET`  | `/current-fund?workAreaCode={code}`            | Cabecera del fondo (asignado, saldo, pendientes). | `cargarDatosIniciales`                     |
-| 2   | `POST` | `/findByFilter`                                | Búsqueda paginada por estado/fecha.               | `buscarRembolsoListener`                   |
-| 3   | `GET`  | `/{replenishmentId}`                           | Ver una reposición y su detalle.                  | `visualizarRembolso`                       |
-| 4   | `POST` | ``                                             | Crear reposición (`PENDING`).                     | `transGuardarOActualizarRembolso`          |
-| 5   | `POST` | `/{replenishmentId}`                           | Actualizar reposición pendiente.                  | `transGuardarOActualizarRembolso`          |
-| 6   | `POST` | `/{replenishmentId}/details`                   | Agregar línea de documento (con validaciones).    | `agregarFilaDetalle`                       |
-| 7   | `POST` | `/{replenishmentId}/details/{detailId}`        | Editar línea de documento.                        | `actualizarReposicion`                     |
-| 8   | `POST` | `/{replenishmentId}/details/{detailId}/delete` | Eliminar línea.                                   | `eliminarFilaDetalle`                      |
-| 9   | `POST` | `/{replenishmentId}/send`                      | Enviar a contabilidad.                            | `onclickEnviarRembolso`                    |
-| 10  | `POST` | `/{replenishmentId}/cancel`                    | Anular reposición.                                | `transAnularSolicitudReposicion`           |
-| 11  | `GET`  | `/{replenishmentId}/print`                     | Generar PDF de la reposición.                     | `imprimirReposicion`                       |
-| 12  | `GET`  | `/responsibles?workAreaCode={code}`            | Responsables del local (principal + secundarios). | `cargarFuncionariosResponsables`           |
-| 13  | `POST` | `/validate-duplicate`                          | Validar documento no duplicado.                   | `transObtenerReposicionCanceladaCajaChica` |
-| 14  | `POST` | `/validate-vat`                                | Calcular/validar IVA (`total/1.15`).              | control en `agregarFilaDetalle`            |
-| 15  | `GET`  | `/document-types`                              | Catálogo de tipos de documento.                   | `verificaTipoDocumento`                    |
-| 16  | `GET`  | `/billing-concepts?type={LC\|LO}`              | Conceptos de facturación (SIF).                   | `listarConAreTraFin`                       |
+| #   | Método | Ruta                                                                    | Descripción                                       | Origen legacy                              |
+| --- | ------ | ----------------------------------------------------------------------- | ------------------------------------------------- | ------------------------------------------ |
+| 1   | `GET`  | `/replenishment-management/current-fund?workAreaCode={code}`            | Cabecera del fondo (asignado, saldo, pendientes). | `cargarDatosIniciales`                     |
+| 2   | `POST` | `/replenishments/findByFilter`                                          | Búsqueda paginada por estado/fecha.               | `buscarRembolsoListener`                   |
+| 3   | `GET`  | `/replenishments/{replenishmentId}`                                     | Ver una reposición y su detalle.                  | `visualizarRembolso`                       |
+| 4   | `POST` | `/replenishment-management`                                             | Crear reposición (`PENDING`).                     | `transGuardarOActualizarRembolso`          |
+| 5   | `POST` | `/replenishment-management/{replenishmentId}`                           | Actualizar reposición pendiente.                  | `transGuardarOActualizarRembolso`          |
+| 6   | `POST` | `/replenishment-management/{replenishmentId}/details`                   | Agregar línea de documento (con validaciones).    | `agregarFilaDetalle`                       |
+| 7   | `POST` | `/replenishment-management/{replenishmentId}/details/{detailId}`        | Editar línea de documento.                        | `actualizarReposicion`                     |
+| 8   | `POST` | `/replenishment-management/{replenishmentId}/details/{detailId}/delete` | Eliminar línea.                                   | `eliminarFilaDetalle`                      |
+| 9   | `POST` | `/replenishment-management/{replenishmentId}/send`                      | Enviar a contabilidad.                            | `onclickEnviarRembolso`                    |
+| 10  | `POST` | `/replenishment-management/{replenishmentId}/cancel`                    | Anular reposición.                                | `transAnularSolicitudReposicion`           |
+| 11  | `GET`  | `/replenishment-management/{replenishmentId}/print`                     | Generar PDF de la reposición.                     | `imprimirReposicion`                       |
+| 12  | `GET`  | `/replenishments/responsibles?workAreaCode={code}`                      | Responsables del local (principal + secundarios). | `cargarFuncionariosResponsables`           |
+| 13  | `POST` | `/replenishments/validate-duplicate`                                    | Validar documento no duplicado.                   | `transObtenerReposicionCanceladaCajaChica` |
+| 14  | `POST` | `/replenishments/validate-vat`                                          | Calcular/validar IVA (`total/1.15`).              | control en `agregarFilaDetalle`            |
+| 15  | `GET`  | `/replenishments/document-types`                                        | Catálogo de tipos de documento.                   | `verificaTipoDocumento`                    |
+| 16  | `GET`  | `/replenishments/billing-concepts?type={LC\|LO}`                        | Conceptos de facturación (SIF).                   | `listarConAreTraFin`                       |
 
 > Las retenciones (endpoints 17+) se detallan en el **Módulo 5**, pero el módulo 1 las consume al agregar un detalle de tipo retención.
 
 ### 6.3 Ejemplos de estructuras JSON
 
-#### `GET /api/v1/replenishments/current-fund?workAreaCode=186`
+#### `GET /api/v1/replenishment-management/current-fund?workAreaCode=186`
 
 ```json
 {
@@ -339,7 +341,7 @@ Response:
 }
 ```
 
-#### `POST /api/v1/replenishments/{replenishmentId}/details` (agregar factura)
+#### `POST /api/v1/replenishment-management/{replenishmentId}/details` (agregar factura)
 
 Request:
 
@@ -422,7 +424,7 @@ Response:
 }
 ```
 
-#### `POST /api/v1/replenishments/{replenishmentId}/send`
+#### `POST /api/v1/replenishment-management/{replenishmentId}/send`
 
 Request:
 

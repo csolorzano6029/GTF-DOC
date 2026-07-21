@@ -5,7 +5,7 @@ meta {
 }
 
 post {
-  url: {{host}}/gtfReplacementsServices/api/v1/replenishments/37638/details/delete
+  url: {{host}}/gtfReplacementsServices/api/v1/replenishment-management/37638/details/delete
   body: json
   auth: inherit
 }
@@ -27,7 +27,7 @@ example {
   name: Escenario exitoso
 
   request: {
-    url: {{host}}/gtfReplacementsServices/api/v1/replenishments/37638/details/delete
+    url: {{host}}/gtfReplacementsServices/api/v1/replenishment-management/37638/details/delete
     method: POST
     mode: json
     body:json: {
@@ -73,7 +73,7 @@ example {
   name: Escenario con lista vacia
 
   request: {
-    url: {{host}}/gtfReplacementsServices/api/v1/replenishments/37638/details/delete
+    url: {{host}}/gtfReplacementsServices/api/v1/replenishment-management/37638/details/delete
     method: POST
     mode: json
     body:json: {
