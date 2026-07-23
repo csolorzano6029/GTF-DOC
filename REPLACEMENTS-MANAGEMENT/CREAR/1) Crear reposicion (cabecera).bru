@@ -15,7 +15,7 @@ body:json {
     "workAreaCode": 105,
     "transactionCode": "1",
     "responsiblePersonDocument": "1708682446",
-    "observation": "Prueba create gastos personales 2"
+    "observation": "Prueba create caja chica"
   }
 }
 
@@ -27,15 +27,33 @@ settings {
 docs {
   ## Objetivo
   Crear una reposicion de cabecera en estado pendiente.
+
+  ## Metodo y ruta
+  - Metodo: `POST`
+  - Ruta: `/api/v1/replenishment-management`
   
   ## Pantalla Front
   Administracion de Reposiciones -> Formulario cabecera -> Nueva reposicion.
+
+  ## Cuando usarlo
+  - Luego de `validate-new` exitoso.
+  - Al iniciar una nueva reposicion para el local actual.
   
   ## Parametros
   - `workAreaCode` (obligatorio).
   - `observation` (obligatorio).
   - `responsiblePersonId` o `responsiblePersonDocument`.
-  - `transactionCode` opcional (`1`/`2`, default `1`).
+  - `transactionCode` opcional (alcance actual orientado a `1`).
+
+  ## Reglas funcionales clave
+  - La cabecera inicia en estado pendiente cuando supera validaciones.
+  - Si `responsiblePersonId` no llega, backend puede resolver responsable por documento.
+  - Si falla una regla funcional, se mantiene contrato 200 con `message` explicativo.
+
+  ## Prioridad recomendada de lectura en Front
+  1. Validar `code` y `message` para feedback inmediato.
+  2. Usar `data.replenishmentId` para habilitar seccion de detalle.
+  3. Renderizar local/responsable/estado desde `data` para encabezado de pantalla.
   
   ## Respuesta esperada
   Cabecera creada con datos enriquecidos de local/responsable y estado pendiente.

@@ -12,16 +12,14 @@ post {
 
 body:json {
   {
-    "workAreaCode": 186,
-    "transactionCode": "2",
     "detail": {
       "documentType": "FAC",
-      "taxId": "1790016919001",
-      "documentNumber": "001-001-000099991",
+      "taxId": "1103264071001",
+      "documentNumber": "006-012-000149434",
       "documentDate": 1783684800000,
       "billingConceptSequence": 1,
-      "requestedValue": 10.0,
-      "vatValue": 1.30
+      "requestedValue": 90.0,
+      "vatValue": 2.50
     },
     "currentRequestedTotal": 5.0
   }
@@ -41,20 +39,44 @@ docs {
   
   ## Parametros
   - `workAreaCode`.
-  - `transactionCode` (`1`/`2`, opcional).
+  - `transactionCode` (`1`, opcional; si no llega se usa `1`).
   - `currentRequestedTotal` (opcional).
   - `detail` (objeto de linea).
   
   ## Respuesta esperada
-  Banderas de resultado en `data` y lista de errores de negocio en `errors` (raiz).
+  Banderas operativas en `data` y lista de errores de negocio en `errors` (raiz).
   
+  ## Semantica clara de banderas en data
+  - `data.valid`
+    - `true`: la fila cumple reglas de negocio y se puede agregar.
+    - `false`: existe al menos una regla incumplida; revisar `errors[]`.
+  - `data.blockedByAvailableBalance`
+    - `true`: el total proyectado (`currentRequestedTotal + detail.requestedValue`) supera el saldo disponible del fondo (`cashBalance`).
+    - Efecto UI: bloquear agregado de fila y mostrar mensaje de saldo.
+  - `data.blockedByUsagePercentage`
+    - `true`: el total proyectado supera el porcentaje maximo de uso permitido (`usagePercentage`) sobre el fondo asignado.
+    - Efecto UI: bloquear agregado de fila y mostrar mensaje de porcentaje.
+  - `data.sendAlert`
+    - `true`: NO bloquea. Solo indica alerta preventiva de envio porque el total proyectado supera el umbral de alerta (`alertPercentage`) sin violar reglas bloqueantes.
+    - `false`: no hay alerta preventiva, o existe alguna regla bloqueante.
+
+  ## Regla de alcance de estas banderas
+  - Estas tres banderas operativas (`blockedByAvailableBalance`, `blockedByUsagePercentage`, `sendAlert`) aplican cuando `transactionCode = "1"` (Caja Chica).
+  - Para otros codigos no soportados, la API responde error funcional y `valid = false`.
+
+  ## Prioridad recomendada de lectura en Front
+  1. Si `valid = false`, no agregar fila y mostrar `errors[]`.
+  2. Si `blockedByAvailableBalance = true` o `blockedByUsagePercentage = true`, tratar como bloqueo de negocio.
+  3. Si `valid = true` y `sendAlert = true`, permitir agregar fila pero mostrar advertencia visual de envio recomendado.
+  4. Si `valid = true` y `sendAlert = false`, continuar flujo normal.
+
   ## Mapeo de campos API -> pantalla Front
-  - `data.valid` -> habilita o bloquea agregar fila temporal.
-  - `data.sendAlert` -> activar aviso de envio recomendado en UI.
+  - `data.valid` -> resultado global para habilitar o bloquear agregado.
+  - `data.sendAlert` -> advertencia visual no bloqueante (umbral de alerta).
   - `data.blockedByAvailableBalance` -> bloqueo por saldo disponible.
   - `data.blockedByUsagePercentage` -> bloqueo por porcentaje de consumo.
-  - `errors[]` -> detalle de mensajes por regla incumplida.
-  - `message` -> texto general de resultado (`OK` o validacion generica).
+  - `errors[]` -> detalle de reglas incumplidas para mostrar al usuario.
+  - `message` -> texto general del resultado (`OK` o validacion generica).
 }
 
 example {

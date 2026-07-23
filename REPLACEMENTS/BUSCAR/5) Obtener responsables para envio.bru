@@ -5,13 +5,13 @@ meta {
 }
 
 get {
-  url: {{host}}/gtfReplacementsServices/api/v1/replenishments/responsibles?workAreaCode=186
+  url: {{host}}/gtfReplacementsServices/api/v1/replenishments/responsibles
   body: none
   auth: inherit
 }
 
 params:query {
-  workAreaCode: 186
+  ~workAreaCode: 186
 }
 
 settings {
@@ -23,15 +23,32 @@ docs {
   ## Objetivo
   Obtener responsables de pago por ventanilla para el area de trabajo seleccionada.
 
+  ## Metodo y ruta
+  - Metodo: `GET`
+  - Ruta: `/api/v1/replenishments/responsibles`
+  
   ## Pantalla Front
   Administracion de Reposiciones -> Flujo de envio -> Selector de responsable.
 
+  ## Cuando usarlo
+  - Antes de ejecutar envio de reposicion.
+  - Al cambiar local/area en contexto de operacion.
+  
   ## Parametros
-  - Query workAreaCode (obligatorio).
+  - Query `workAreaCode` (obligatorio).
 
+  ## Reglas funcionales clave
+  - Si la lista llega vacia, no existe responsable habilitado para ese local/area.
+  - Front debe impedir envio cuando no hay responsables disponibles.
+
+  ## Prioridad recomendada de lectura en Front
+  1. Poblar selector desde `data[]`.
+  2. Mostrar `fullName` y conservar `personId` como valor seleccionado.
+  3. Usar `type` para etiqueta complementaria (ejemplo: PRINCIPAL/SECUNDARIO).
+  
   ## Respuesta esperada
   Lista de responsables disponibles para envio.
-
+  
   ## Mapeo de campos API -> pantalla Front
   - personId -> valor tecnico del responsable seleccionado.
   - fullName -> nombre completo visible en el selector.

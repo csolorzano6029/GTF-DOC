@@ -41,8 +41,8 @@ Resultado de segunda revision funcional legacy:
 
 Precision funcional cerrada (legacy + migrado):
 
-1. Para capacidades sin diferencia funcional, Revision consume endpoints shared existentes (`/api/v1/replenishments/...`).
-2. Solo se crea endpoint en `replenishment-reviews` cuando exista brecha funcional real (reglas distintas, enrichment de respuesta, permisos o contrato Front).
+1. El backend actual de `replenishments/findByFilter` ya cubre filtros dinamicos (alias, comparadores y estado "Todos"), por lo que no es obligatorio crear un endpoint nuevo para H1.
+2. El endpoint `POST /api/v1/replenishment-reviews/findByFilter` queda como wrapper opcional de contexto (segregacion de dominio/seguridad) y no como requisito tecnico minimo.
 3. El estado revisable operativo para acciones de Revision (editar/validar/anular) es ENVIADA (ENV).
 
 ### 2.3 Reglas tecnicas obligatorias
@@ -77,36 +77,34 @@ Estas transacciones guian los criterios de aceptacion de las historias E2.
 
 ## 4) Matriz de reutilizacion (evitar doble trabajo)
 
-### 4.1 Reutilizacion interna de reglas
+### 4.1 Reutilizacion directa
 
-| Capacidad interna reutilizable | Uso en Revision                                                | Accion                                           |
-| ------------------------------ | -------------------------------------------------------------- | ------------------------------------------------ |
-| Validacion de IVA              | Validar ajuste de IVA en detalle aprobado (H3)                 | Reutilizar internamente en servicios             |
-| Validacion de duplicidad       | Verificar duplicidad documental en ajustes/retenciones (H3/H8) | Reutilizar internamente en servicios             |
-| Resolucion de responsables     | Responsable operativo para flujo de validacion                 | Reutilizar internamente donde aplique            |
-| Lectura de cabecera y detalle  | Apertura de solicitud en revision (H2)                         | Reutilizar internamente sin exponer rutas shared |
-| Prevalidacion de detalle       | Prevalidar cambios de detalle en modo revision                 | Reutilizar internamente sin duplicar reglas      |
+| Activo actual                                  | Uso en Revision                                                | Accion                                  |
+| ---------------------------------------------- | -------------------------------------------------------------- | --------------------------------------- |
+| POST /api/v1/replenishments/validate-vat       | Validar ajuste de IVA en detalle aprobado (H3)                 | Reutilizar directo (sin endpoint nuevo) |
+| POST /api/v1/replenishments/validate-duplicate | Verificar duplicidad documental en ajustes/retenciones (H3/H8) | Reutilizar directo (sin endpoint nuevo) |
+| GET /api/v1/replenishments/responsibles        | Responsable operativo para flujo de validacion                 | Reutilizar directo (sin endpoint nuevo) |
 
-### 4.2 Matriz de consumo para Revision (reuso directo vs endpoint nuevo)
+### 4.2 Reutilizacion condicionada
 
-| Capacidad interna (reuso)             | Endpoint actual disponible                                         | Uso en Revision                                         | Decision actual                                              |
-| ------------------------------------- | ------------------------------------------------------------------ | ------------------------------------------------------- | ------------------------------------------------------------ |
-| Filtros dinamicos de busqueda         | POST /api/v1/replenishments/findByFilter                           | Buscar reposiciones para revision (H1)                  | Reuso directo (sin endpoint nuevo mientras no exista brecha) |
-| Lectura de cabecera                   | GET /api/v1/replenishments/{replenishmentId}                       | Visualizar cabecera de reposicion en revision (H2)      | Reuso directo (sin endpoint nuevo mientras no exista brecha) |
-| Lectura de detalle                    | GET /api/v1/replenishments/{replenishmentId}/details               | Visualizar detalle de reposicion en revision (H2)       | Reuso directo (sin endpoint nuevo mientras no exista brecha) |
-| Consulta de conceptos                 | GET /api/v1/replenishments/billing-concepts                        | Popup de conceptos en revision (H7)                     | Reuso directo (sin endpoint nuevo mientras no exista brecha) |
-| Prevalidacion de detalle con cabecera | POST /api/v1/replenishments/{replenishmentId}/details/validate-add | Prevalidar cambios de detalle en modo revision          | Reuso directo (sin endpoint nuevo mientras no exista brecha) |
-| Prevalidacion sin cabecera persistida | POST /api/v1/replenishments/details/validate-add                   | Prevalidar detalle cuando no exista cabecera persistida | Reuso directo (sin endpoint nuevo mientras no exista brecha) |
+| Activo actual (interno)                                            | API expuesta en Revision                                                                                                                       | Uso en Revision                                              | Accion                                                         |
+| ------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ | -------------------------------------------------------------- |
+| POST /api/v1/replenishments/findByFilter                           | Opcional: POST /api/v1/replenishment-reviews/findByFilter                                                                                      | Buscar reposiciones para revision (H1) con filtros dinamicos | Reuso directo recomendado; wrapper opcional sin duplicar query |
+| GET /api/v1/replenishments/{replenishmentId}                       | Base recomendada: GET /api/v1/replenishments/{replenishmentId} / Opcional: GET /api/v1/replenishment-reviews/{replenishmentId}                 | Visualizar cabecera de reposicion en revision (H2)           | Reuso directo recomendado; wrapper opcional por segregacion    |
+| GET /api/v1/replenishments/{replenishmentId}/details               | Base recomendada: GET /api/v1/replenishments/{replenishmentId}/details / Opcional: GET /api/v1/replenishment-reviews/{replenishmentId}/details | Visualizar detalle de reposicion en revision (H2)            | Reuso directo recomendado; wrapper opcional por segregacion    |
+| GET /api/v1/replenishments/billing-concepts                        | GET /api/v1/replenishment-reviews/billing-concepts                                                                                             | Popup de conceptos en revision (H7)                          | Reutilizar con wrapper de lectura                              |
+| POST /api/v1/replenishments/{replenishmentId}/details/validate-add | POST /api/v1/replenishment-reviews/{replenishmentId}/details/validate-add                                                                      | Prevalidar cambios de detalle en modo revision               | Reutilizar con wrapper de reglas de revision                   |
+| POST /api/v1/replenishments/details/validate-add                   | POST /api/v1/replenishment-reviews/details/validate-add                                                                                        | Prevalidar detalle cuando no exista cabecera persistida      | Reutilizar con wrapper de reglas de revision                   |
 
 Regla de consumo para H1/H2 (ajustada con evidencia):
 
-1. H1 y H2 consumen por defecto endpoints shared (`/api/v1/replenishments/...`) porque la logica actual ya cubre ambos escenarios.
-2. H1 usa `POST /api/v1/replenishments/findByFilter`.
-3. H2 usa `GET /api/v1/replenishments/{replenishmentId}` y `GET /api/v1/replenishments/{replenishmentId}/details`.
-4. Si aparece brecha funcional real (filtros extra, enrichment, permisos o contrato distinto), se crea endpoint en `/api/v1/replenishment-reviews/...` como subtarea tecnica.
-5. La regla funcional se mantiene: acciones de Revision (editar/validar/anular) solo cuando estado = ENVIADA (ENV).
+1. H1 puede salir a produccion consumiendo directamente `POST /api/v1/replenishments/findByFilter`.
+2. Si se requiere separacion de dominio o seguridad por ruta, se expone `POST /api/v1/replenishment-reviews/findByFilter` como wrapper sin duplicar query.
+3. H2 puede salir a produccion consumiendo directamente `GET /api/v1/replenishments/{replenishmentId}` y `GET /api/v1/replenishments/{replenishmentId}/details`.
+4. Si se requiere separacion de dominio o seguridad por ruta, se exponen wrappers equivalentes en `/api/v1/replenishment-reviews/...` sin duplicar lectura.
+5. En ambos casos se mantiene la regla funcional: acciones de Revision (editar/validar/anular) solo cuando estado = ENVIADA (ENV).
 6. Consideracion tecnica: `GET /details` retorna lineas activas de detalle (estado de detalle activo), no aplica filtro por estado de cabecera.
-7. No duplicar query ni paginacion si se habilita wrapper de Revision.
+7. Los activos de 4.1 se mantienen como reuso directo (sin endpoint nuevo).
 
 ### 4.3 No reutilizar (crear en modulo de revision)
 
@@ -119,13 +117,13 @@ Regla de consumo para H1/H2 (ajustada con evidencia):
 
 | Historia | Endpoint(s) objetivo                                                                                                                                                                                  | Tipo de API                           | Referencia |
 | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------- | ---------- |
-| E2-H1    | POST /api/v1/replenishments/findByFilter                                                                                                                                                              | Reuso directo de API shared           | 4.2        |
-| E2-H2    | GET /api/v1/replenishments/{replenishmentId}; GET /api/v1/replenishments/{replenishmentId}/details                                                                                                    | Reuso directo de API shared           | 4.2        |
+| E2-H1    | POST /api/v1/replenishments/findByFilter (base) / opcional wrapper POST /api/v1/replenishment-reviews/findByFilter                                                                                    | Reuso directo con wrapper opcional    | 4.2        |
+| E2-H2    | GET /api/v1/replenishments/{replenishmentId}; GET /api/v1/replenishments/{replenishmentId}/details (base) / wrappers opcionales en /replenishment-reviews                                             | Reuso directo con wrapper opcional    | 4.2        |
 | E2-H3    | POST /api/v1/replenishment-reviews/{replenishmentId}/details/{detailId}/adjust                                                                                                                        | Nueva API + validaciones reutilizadas | 4.1        |
 | E2-H4    | POST /api/v1/replenishment-reviews/{replenishmentId}/validate                                                                                                                                         | Nueva API                             | 4.3        |
 | E2-H5    | POST /api/v1/replenishment-reviews/{replenishmentId}/cancel                                                                                                                                           | Nueva API                             | 4.3        |
 | E2-H6    | Scheduler interno (sin endpoint publico)                                                                                                                                                              | Nuevo componente                      | 4.3        |
-| E2-H7    | GET /api/v1/replenishments/billing-concepts; POST /api/v1/replenishment-reviews/{replenishmentId}/details/{detailId}/adjust-concept                                                                   | Mixta: shared (GET) + nueva (POST)    | 4.2 + 4.3  |
+| E2-H7    | GET /api/v1/replenishment-reviews/billing-concepts; POST /api/v1/replenishment-reviews/{replenishmentId}/details/{detailId}/adjust-concept                                                            | Mixta: wrapper (GET) + nueva (POST)   | 4.2 + 4.3  |
 | E2-H8    | POST /api/v1/replenishment-reviews/{replenishmentId}/details/{detailId}/withholding/validate; POST /api/v1/replenishment-reviews/{replenishmentId}/details/{detailId}/withholding/validate-access-key | Nueva API                             | 4.3        |
 | E2-H9    | POST /api/v1/replenishment-reviews/{replenishmentId}/details/{detailId}/support-file                                                                                                                  | Nueva API                             | 4.3        |
 | E2-H10   | Decision funcional en Jira (sin endpoint directo)                                                                                                                                                     | Sin API directa                       | N/A        |
@@ -140,28 +138,27 @@ con paridad funcional legacy y reutilizacion de APIs ya construidas en administr
 Regla de backlog (ajustada):
 
 1. Este backlog de implementacion incluye solo desarrollo backend nuevo.
-2. H1 (filtro) y H2 (lectura por id) se ejecutan por reuso directo de endpoints shared actuales, sin desarrollo backend nuevo por defecto.
-3. Si en H1/H2 aparece brecha funcional real, se crea subtarea tecnica para endpoint de `replenishment-reviews`.
-4. Las APIs de H3 a H9 siguen como foco de desarrollo nuevo en Revision.
+2. H1 (filtro) y H2 (lectura por id) quedan como consumo/reuso de endpoints ya existentes,
+   por lo que no generan tareas de desarrollo en este paquete base.
+3. Las APIs de H3 a H9 son exclusivas de Revision (`/api/v1/replenishment-reviews/...`)
+   y no aplican como endpoints de Administracion.
 
-### E2-H1 - Consulta de reposiciones para revision (filtros y paginacion)
+### E2-H1 - Buscar reposiciones enviadas para revision
 
 Endpoint objetivo:
 
-1. POST /api/v1/replenishments/findByFilter
+1. Base recomendada: POST /api/v1/replenishments/findByFilter
+2. Opcional por segregacion de contexto: POST /api/v1/replenishment-reviews/findByFilter
 
 Tipo de API en este plan:
 
-1. Reuso directo de API shared existente.
-2. Endpoint nuevo en `replenishment-reviews` solo si se detecta brecha funcional comprobada.
+1. Reuso directo del endpoint existente con reglas funcionales de Revision.
+2. Wrapper opcional solo si se requiere separacion por ruta/permisos.
 
 Tareas de desarrollo backend:
 
-1. Validar que `POST /api/v1/replenishments/findByFilter` cubre filtros de Revision (area, estado y fechas).
-2. Confirmar normalizacion de alias/comparadores (`replenishmentStatus`, `replenishmentDate`) sin cambios de query.
-3. Verificar forzado de contexto de compania/area segun sesion.
-4. Si se detecta brecha funcional, abrir subtarea para endpoint `POST /api/v1/replenishment-reviews/findByFilter` delegando a la misma logica.
-5. Pruebas de contrato y regresion de consumo Front Revision.
+1. No aplica en este backlog base (reuso de endpoint existente).
+2. Si se aprueba wrapper de contexto, abrir historia tecnica separada fuera del paquete de APIs nuevas.
 
 Criterios de consumo/QA:
 
@@ -170,24 +167,24 @@ Criterios de consumo/QA:
 3. Estado revisable operativo para acciones (editar/validar/anular): solo ENVIADA (ENV).
 4. Debe mantener envelope BaseResponseVo.
 
-### E2-H2 - Apertura de reposicion para revision (cabecera y detalle)
+### E2-H2 - Visualizar reposicion para revision
 
 Endpoint objetivo:
 
-1. GET /api/v1/replenishments/{replenishmentId}
-2. GET /api/v1/replenishments/{replenishmentId}/details
+1. Base recomendada: GET /api/v1/replenishments/{replenishmentId}
+2. Base recomendada: GET /api/v1/replenishments/{replenishmentId}/details
+3. Opcional por segregacion de contexto: GET /api/v1/replenishment-reviews/{replenishmentId}
+4. Opcional por segregacion de contexto: GET /api/v1/replenishment-reviews/{replenishmentId}/details
 
 Tipo de API en este plan:
 
-1. Reuso directo de APIs shared de lectura.
-2. Endpoint nuevo en `replenishment-reviews` solo si se detecta brecha funcional comprobada.
+1. Reuso directo recomendado de los GET actuales.
+2. Wrapper de lectura opcional si se aprueba segregacion por ruta/permisos.
 
 Tareas de desarrollo backend:
 
-1. Validar que la lectura shared de cabecera/detalle cubre datos requeridos para Revision.
-2. Confirmar que los flags operativos para acciones de Revision se pueden derivar sin cambiar contrato.
-3. Si aparece brecha funcional (campos faltantes o reglas de permisos), abrir subtarea para endpoints de `replenishment-reviews` sin duplicar logica.
-4. Pruebas de contrato y escenarios funcionales.
+1. No aplica en este backlog base (reuso de endpoints existentes).
+2. Si se aprueba wrapper de contexto, abrir historia tecnica separada fuera del paquete de APIs nuevas.
 
 Criterios de consumo/QA:
 
@@ -197,7 +194,7 @@ Criterios de consumo/QA:
 4. La lectura no debe restringirse por estado especifico de cabecera; la restriccion aplica a acciones de Revision.
 5. No debe romper contratos vigentes de administracion.
 
-### E2-H3 - Ajuste contable por detalle con recalculo de totales
+### E2-H3 - Ajustar valores aprobados en detalle
 
 Endpoint objetivo:
 
@@ -224,7 +221,7 @@ Criterios de aceptacion:
 2. Debe validar IVA con la misma regla de administracion.
 3. Debe mantener detalle historico (sin hard delete).
 
-### E2-H4 - Validacion contable de reposicion revisada
+### E2-H4 - Validar reposicion
 
 Endpoint objetivo:
 
@@ -250,7 +247,7 @@ Criterios de aceptacion:
 2. Si hay linea rechazada sin justificacion, rechaza la validacion.
 3. Si valida exitosamente, deja estado en VALIDATED.
 
-### E2-H5 - Anulacion de reposicion en flujo de revision
+### E2-H5 - Anular reposicion desde revision
 
 Endpoint objetivo:
 
@@ -276,7 +273,7 @@ Criterios de aceptacion:
 2. Solo se anula si el estado es anulable desde revision.
 3. La respuesta debe detallar motivo en errors[] cuando falle.
 
-### E2-H6 - Cierre automatico post-validacion (scheduler)
+### E2-H6 - Cierre post-validacion (job)
 
 Componente objetivo:
 
@@ -296,7 +293,7 @@ Criterios de aceptacion:
 2. Debe registrar cantidad procesada y errores por corrida.
 3. Debe ser idempotente ante reintentos.
 
-### E2-H7 - Gestion de conceptos en detalle de revision
+### E2-H7 - Gestion de conceptos en revision (popup + cambio de concepto)
 
 Endpoint objetivo:
 
@@ -305,7 +302,7 @@ Endpoint objetivo:
 
 Tipo de API en este plan:
 
-1. `GET /billing-concepts` es endpoint de Revision con reuso interno de logica.
+1. `GET /billing-concepts` es reutilizacion condicionada (wrapper sobre `replenishments`).
 2. `POST /adjust-concept` es API nueva de Revision.
 
 Alcance:
@@ -328,7 +325,7 @@ Criterios de aceptacion:
 2. Debe registrar la actualizacion de concepto en la misma trazabilidad de ajuste.
 3. Debe conservar compatibilidad con reglas de validacion existentes de detalle.
 
-### E2-H8 - Validacion de retenciones y documentos de respaldo
+### E2-H8 - Validacion de retenciones y documentos en revision
 
 Endpoint objetivo:
 
@@ -356,7 +353,7 @@ Criterios de aceptacion:
 2. Debe devolver errores funcionales detallados cuando falle validacion documental.
 3. Debe persistir conceptos de retencion validados en el detalle de revision.
 
-### E2-H9 - Gestion de archivo de soporte y regla de huella de carbono
+### E2-H9 - Gestion de archivo soporte y regla de huella de carbono en revision
 
 Endpoint objetivo:
 
@@ -382,7 +379,7 @@ Criterios de aceptacion:
 2. Debe soportar flujo de reemplazo de archivo y trazabilidad del cambio.
 3. Debe fallar con mensaje funcional cuando falte soporte requerido.
 
-### E2-H10 - Cierre de alcance: Gastos Personales (decision y trazabilidad)
+### E2-H10 - Decision de alcance sobre Gastos Personales (control de brecha)
 
 Componente objetivo:
 
@@ -407,7 +404,8 @@ Criterios de aceptacion:
 
 Metodo y ruta:
 
-1. POST /api/v1/replenishments/findByFilter
+1. Base recomendada: POST /api/v1/replenishments/findByFilter
+2. Opcional por contexto: POST /api/v1/replenishment-reviews/findByFilter
 
 Request ejemplo:
 
@@ -426,7 +424,7 @@ Regla principal:
 
 1. Debe soportar filtros dinamicos de legacy (estado/fecha/area) reutilizando la logica actual.
 2. Las acciones de Revision (editar/validar/anular) solo aplican para estado ENVIADA (ENV).
-3. Si no existe brecha funcional, Front Revision consume shared; si aparece brecha, se habilita endpoint de Revision delegando internamente sin duplicar query.
+3. Si se habilita ruta `replenishment-reviews`, debe ser wrapper sin duplicar query.
 
 ### 6.2 Ajustar detalle aprobado
 
@@ -539,12 +537,12 @@ Reglas principales:
 2. Si existe archivo previo y se reemplaza, registrar limpieza/control del anterior.
 3. Conservar trazabilidad del cambio en la linea de detalle.
 
-### 6.7 Prevalidar detalle en revision (reuso actual)
+### 6.7 Prevalidar detalle en revision (wrapper)
 
 Metodo y ruta:
 
-1. POST /api/v1/replenishments/{replenishmentId}/details/validate-add
-2. POST /api/v1/replenishments/details/validate-add
+1. POST /api/v1/replenishment-reviews/{replenishmentId}/details/validate-add
+2. POST /api/v1/replenishment-reviews/details/validate-add
 
 Request ejemplo (sin cabecera persistida):
 
@@ -565,37 +563,44 @@ Request ejemplo (sin cabecera persistida):
 
 Reglas principales:
 
-1. Revision reutiliza estas rutas shared mientras no exista brecha funcional.
-2. Si se requiere regla exclusiva de Revision, se habilita wrapper en `replenishment-reviews` delegando validaciones existentes.
-3. Evitar duplicar reglas de prevalidacion entre shared y Revision.
+1. El Front de Revision llama siempre rutas `/replenishment-reviews/...`.
+2. El wrapper reutiliza internamente validaciones de `replenishments`.
+3. El wrapper agrega reglas propias de Revision sin requerir parametro extra de contexto.
 
 ## 7) Ubicacion esperada en Bruno (plan de implementacion)
 
-Rutas base de coleccion:
+Ruta base de coleccion:
 
-1. Reuso de endpoints shared: GTF-DOC/REPLACEMENTS
-2. Endpoints nuevos de Revision: GTF-DOC/REPLACEMENTS-REVIEWS
+1. GTF-DOC/REPLACEMENTS
 
-Ubicacion sugerida para cada endpoint segun estrategia vigente:
+Ubicacion sugerida para cada endpoint de revision (nuevo o wrapper):
 
-1. Shared (REPLACEMENTS/BUSCAR): Buscar reposiciones, obtener reposicion por id, listar conceptos.
-2. Shared (REPLACEMENTS/VALIDAR): Prevalidar detalle con y sin cabecera.
-3. Revision (REPLACEMENTS-REVIEWS/ACTUALIZAR): Ajustar detalle aprobado, validar reposicion, anular reposicion, ajustar concepto, retenciones, archivo soporte.
+1. BUSCAR/7) Buscar reposiciones en revision.bru
+2. BUSCAR/8) Obtener reposicion en revision por id.bru
+3. BUSCAR/9) Listar conceptos en revision.bru
+4. ACTUALIZAR/5) Prevalidar detalle en revision con cabecera.bru
+5. ACTUALIZAR/6) Prevalidar detalle en revision sin cabecera.bru
+6. ACTUALIZAR/7) Ajustar detalle aprobado en revision.bru
+7. ACTUALIZAR/8) Validar reposicion en revision.bru
+8. ACTUALIZAR/9) Anular reposicion en revision.bru
+9. ACTUALIZAR/10) Ajustar concepto en revision.bru
+10. ACTUALIZAR/11) Validar retencion en revision.bru
+11. ACTUALIZAR/12) Validar retencion por clave acceso en revision.bru
+12. ACTUALIZAR/13) Cargar archivo soporte en revision.bru
 
 Hint de busqueda rapida en Bruno:
 
-1. Buscar por ruta parcial shared: /api/v1/replenishments/
-2. Buscar por ruta parcial revision: /api/v1/replenishment-reviews/
+1. Buscar por prefijo: Revision
+2. Buscar por ruta parcial: /replenishment-reviews/
 
 ## 8) Plan de ejecucion incremental para el desarrollador asignado
 
-1. Pre-sprint: cerrar verificacion funcional de H1/H2 sobre shared y registrar brechas (si existen).
-2. Sprint 0 (solo si aplica): wrappers de Revision para H1/H2 por brecha validada.
-3. Sprint 1: E2-H3 (ajustes de detalle + recalculo).
-4. Sprint 2: E2-H4 y E2-H5 (validar + anular).
-5. Sprint 3: E2-H6 (job de cierre + observabilidad).
-6. Sprint 4: E2-H7 y E2-H8 (conceptos + retenciones).
-7. Sprint 5: E2-H9 y E2-H10 (archivo/huella + cierre de alcance Gastos Personales).
+1. Pre-sprint: confirmar consumo de H1/H2 por reuso (sin desarrollo backend nuevo).
+2. Sprint 1: E2-H3 (ajustes de detalle + recalculo).
+3. Sprint 2: E2-H4 y E2-H5 (validar + anular).
+4. Sprint 3: E2-H6 (job de cierre + observabilidad).
+5. Sprint 4: E2-H7 y E2-H8 (conceptos + retenciones).
+6. Sprint 5: E2-H9 y E2-H10 (archivo/huella + cierre de alcance Gastos Personales).
 
 ## 9) Definicion de Done (global)
 
@@ -613,7 +618,8 @@ Resumen ejecutivo:
 1. Si hay hallazgos nuevos: el plan inicial no cubria completamente conceptos, retenciones,
    archivo/huella ni la decision formal de alcance de Gastos Personales.
 2. El backlog E2 queda actualizado con historias E2-H7 a E2-H10 para cerrar esas brechas.
-3. Se confirma estrategia hibrida: H1/H2 y consultas equivalentes reutilizan shared; endpoints de `replenishment-reviews` se crean para capacidades propias de Revision o por brecha funcional validada.
+3. Se confirma que los endpoints publicos de Revision deben exponerse bajo `/replenishment-reviews/...`
+   y reutilizar internamente logica de `replenishments` mediante wrapper.
 
 Checklist de brechas detectadas:
 
@@ -623,274 +629,3 @@ Checklist de brechas detectadas:
 | Retencion manual/electronica/XML                  | No cubierto             | Cubierto en E2-H8  |
 | Archivo soporte + huella de carbono               | No cubierto             | Cubierto en E2-H9  |
 | Definicion formal de alcance de Gastos Personales | Ambiguo                 | Cubierto en E2-H10 |
-
-## 11) Texto listo para copiar y pegar en Jira
-
-### E2-H1 - Consulta de reposiciones para revision (filtros y paginacion)
-
-Descripcion sugerida para la historia:
-
-Como usuario del flujo de Revision, necesito consultar reposiciones con filtros dinamicos
-por area, estado y fechas, para identificar rapidamente los casos que requieren gestion
-contable. Esta historia se ejecuta por reuso directo del endpoint shared existente y solo
-requiere desarrollo backend nuevo si se detecta una brecha funcional real.
-
-Subtareas sugeridas (descripcion lista para Jira):
-
-1. E2-H1-T1 - Validar contrato funcional del endpoint shared: Verificar que `POST /api/v1/replenishments/findByFilter` cubre el payload y la respuesta esperada por Front Revision, sin cambios de contrato.
-2. E2-H1-T2 - Validar filtros y alias legacy: Confirmar soporte de `replenishmentStatus`, `replenishmentDate`, operadores dinamicos y estado "Todos" sin duplicar query.
-3. E2-H1-T3 - Validar contexto de seguridad: Confirmar que compania y area se fuerzan por sesion y no por valores manipulables desde request.
-4. E2-H1-T4 - Pruebas de regresion H1: Ejecutar pruebas de contrato/servicio para garantizar que no se rompe consumo de Administracion ni de Revision.
-5. E2-H1-T5 (condicional) - Wrapper de Revision para filtro: Solo si hay brecha validada, exponer `POST /api/v1/replenishment-reviews/findByFilter` delegando a la misma logica.
-
-### E2-H2 - Apertura de reposicion para revision (cabecera y detalle)
-
-Descripcion sugerida para la historia:
-
-Como usuario del flujo de Revision, necesito abrir una reposicion y sus lineas de detalle
-para revisar montos, documentos y estado operativo antes de validar o anular. Esta historia
-usa reuso directo de endpoints shared y solo pasa a wrapper de Revision si se confirma una
-brecha funcional.
-
-Subtareas sugeridas (descripcion lista para Jira):
-
-1. E2-H2-T1 - Validar cabecera para Revision: Confirmar que `GET /api/v1/replenishments/{replenishmentId}` entrega datos requeridos para decision contable.
-2. E2-H2-T2 - Validar detalle para Revision: Confirmar que `GET /api/v1/replenishments/{replenishmentId}/details` devuelve lineas activas con informacion suficiente para revision.
-3. E2-H2-T3 - Validar reglas operativas de accion: Confirmar calculo/derivacion de banderas de accion (editable/validable/anulable) sin romper contrato vigente.
-4. E2-H2-T4 - Pruebas de contrato y regresion H2: Cubrir escenarios de lectura existentes y consumo de Front Revision.
-5. E2-H2-T5 (condicional) - Wrapper de Revision para apertura: Solo si hay brecha validada, exponer wrappers en `/api/v1/replenishment-reviews/...` delegando logica existente.
-
-### E2-H3 - Ajuste contable por detalle con recalculo de totales
-
-Descripcion sugerida para la historia:
-
-Como usuario de Revision, necesito ajustar valores aprobados por linea de detalle con
-trazabilidad y recalculo inmediato de totales, para reflejar la validacion contable real
-sin perder historial ni consistencia transaccional.
-
-Subtareas sugeridas (descripcion lista para Jira):
-
-1. E2-H3-T1 - Definir contrato de ajuste: Crear VO/DTO de entrada y salida para ajuste de detalle con validaciones de campos obligatorios.
-2. E2-H3-T2 - Implementar validaciones contables: Aplicar reglas de IVA, duplicidad, observacion obligatoria y restricciones de negocio por linea.
-3. E2-H3-T3 - Persistir ajuste y recalcular cabecera: Guardar valor aprobado y recalcular totales aprobados de manera atomica.
-4. E2-H3-T4 - Implementar rechazo/reactivacion de linea: Cubrir cambio de estado de detalle sin borrado fisico para mantener trazabilidad.
-5. E2-H3-T5 - Pruebas completas H3: Implementar pruebas unitarias e integracion para escenarios OK/error y regresion.
-
-### E2-H4 - Validacion contable de reposicion revisada
-
-Descripcion sugerida para la historia:
-
-Como usuario de Revision, necesito validar formalmente una reposicion revisada para moverla
-al estado contable correspondiente, garantizando precondiciones funcionales y auditoria
-consistente del proceso.
-
-Subtareas sugeridas (descripcion lista para Jira):
-
-1. E2-H4-T1 - Implementar servicio de validacion: Construir flujo de validacion central con orquestacion de reglas de negocio.
-2. E2-H4-T2 - Implementar precondiciones de validacion: Verificar lineas activas, montos consistentes, observaciones requeridas y estado permitido.
-3. E2-H4-T3 - Persistir cambio de estado y auditoria: Cambiar a `VALIDATED` (codigo legacy `VAL`) cuando corresponda y registrar trazabilidad de usuario/fecha.
-4. E2-H4-T4 - Pruebas funcionales H4: Cubrir escenarios de exito y rechazo con mensajes funcionales claros en `errors[]`.
-
-### E2-H5 - Anulacion de reposicion en flujo de revision
-
-Descripcion sugerida para la historia:
-
-Como usuario de Revision, necesito anular una reposicion con motivo obligatorio para cortar
-el flujo de aprobacion cuando existan inconsistencias, manteniendo auditoria completa y
-reglas de transicion de estado.
-
-Subtareas sugeridas (descripcion lista para Jira):
-
-1. E2-H5-T1 - Definir contrato de anulacion: Crear VO/DTO con observacion obligatoria y validaciones de entrada.
-2. E2-H5-T2 - Implementar reglas de anulacion: Validar estados anulables y restricciones funcionales antes de ejecutar la accion.
-3. E2-H5-T3 - Persistir anulacion y auditoria: Cambiar estado a anulado, registrar motivo y metadatos de trazabilidad.
-4. E2-H5-T4 - Pruebas funcionales H5: Cubrir anulacion correcta, anulacion rechazada y contrato de errores.
-
-### E2-H6 - Cierre automatico post-validacion (scheduler)
-
-Descripcion sugerida para la historia:
-
-Como equipo backend, necesitamos un cierre automatico de reposiciones validadas para
-ejecutar el paso contable final sin intervencion manual, con control de idempotencia,
-observabilidad y manejo de errores por corrida.
-
-Subtareas sugeridas (descripcion lista para Jira):
-
-1. E2-H6-T1 - Implementar scheduler de cierre: Procesar transicion `VALIDATED (VAL) -> PAID/ISSUED (PAG/CHE)` sobre registros elegibles.
-2. E2-H6-T2 - Garantizar idempotencia del job: Evitar dobles cierres ante reintentos o ejecuciones solapadas.
-3. E2-H6-T3 - Implementar observabilidad minima: Registrar metricas, volumen procesado y errores funcionales por ejecucion.
-4. E2-H6-T4 - Pruebas de integracion H6: Validar flujo completo del job, incluyendo reintentos y manejo de fallos.
-
-### E2-H7 - Gestion de conceptos en detalle de revision
-
-Descripcion sugerida para la historia:
-
-Como usuario de Revision, necesito consultar y cambiar el concepto contable de una linea
-de detalle para reflejar correctamente la naturaleza del gasto y mantener consistencia
-con reglas de validacion y recalculo.
-
-Subtareas sugeridas (descripcion lista para Jira):
-
-1. E2-H7-T1 - Integrar consulta de conceptos: Reusar endpoint de conceptos para poblar popup segun area/transaccion/tipo documento.
-2. E2-H7-T2 - Implementar cambio de concepto por linea: Exponer endpoint de ajuste de concepto en contexto de Revision.
-3. E2-H7-T3 - Validar impacto funcional del cambio: Recalcular y mantener trazabilidad cuando el cambio afecta aprobacion.
-4. E2-H7-T4 - Pruebas funcionales H7: Cubrir seleccion/cambio de concepto y escenarios de incompatibilidad.
-
-### E2-H8 - Validacion de retenciones y documentos de respaldo
-
-Descripcion sugerida para la historia:
-
-Como usuario de Revision, necesito validar retenciones manuales y electronicas para asegurar
-consistencia tributaria y documental de cada detalle, incluyendo validaciones por clave de
-acceso y controles de duplicidad.
-
-Subtareas sugeridas (descripcion lista para Jira):
-
-1. E2-H8-T1 - Definir contratos de retencion: Modelar DTOs para validacion manual/electronica con estructura unificada.
-2. E2-H8-T2 - Implementar validacion de retencion manual: Validar impuestos, montos y reglas funcionales del escenario manual.
-3. E2-H8-T3 - Implementar validacion electronica documental: Validar clave de acceso/XML y consistencia de datos tributarios.
-4. E2-H8-T4 - Integrar reglas de contexto y no duplicidad: Aplicar controles de seguridad y duplicidad en flujo de Revision.
-5. E2-H8-T5 - Pruebas funcionales H8: Cubrir escenarios OK/error para manual y electronica.
-
-### E2-H9 - Gestion de archivo de soporte y regla de huella de carbono
-
-Descripcion sugerida para la historia:
-
-Como usuario de Revision, necesito cargar y reemplazar archivo de soporte por linea de detalle
-para cumplir politicas de respaldo documental y la regla de huella de carbono cuando el
-concepto lo exija.
-
-Subtareas sugeridas (descripcion lista para Jira):
-
-1. E2-H9-T1 - Implementar endpoint de archivo soporte: Habilitar carga/actualizacion de soporte documental por detalle.
-2. E2-H9-T2 - Implementar manejo de reemplazo de archivo: Controlar limpieza de archivo previo y trazabilidad de reemplazo.
-3. E2-H9-T3 - Aplicar regla de huella de carbono: Exigir archivo cuando el concepto lo requiera y validar cumplimiento.
-4. E2-H9-T4 - Pruebas funcionales H9: Cubrir carga inicial, reemplazo, validaciones y errores de negocio.
-
-### E2-H10 - Cierre de alcance: Gastos Personales (decision y trazabilidad)
-
-Descripcion sugerida para la historia:
-
-Como responsable funcional/tactico, necesito cerrar formalmente el alcance de Gastos
-Personales para evitar ambiguedades en el backlog, definiendo si se implementa en esta
-epica o si se excluye con aprobacion explicita de negocio.
-
-Subtareas sugeridas (descripcion lista para Jira):
-
-1. E2-H10-T1 - Mesa de definicion con negocio: Confirmar decision funcional (incluir/excluir) sobre Gastos Personales local y exterior.
-2. E2-H10-T2 (si aplica) - Descomponer backlog tecnico: Crear historias y tareas para ciudad, pais, moneda, tasa y totales de exterior.
-3. E2-H10-T3 (si no aplica) - Formalizar exclusion: Registrar exclusion en Jira y actualizar criterios de aceptacion de la epica E2.
-4. E2-H10-T4 - Actualizar trazabilidad de alcance: Reflejar decision final en documentos funcionales y matriz de cobertura.
-
-## 12) Contexto operativo obligatorio para nuevo desarrollador
-
-## 12.1 Fuente de verdad de estados (NO inventados)
-
-Cuando en este plan se usa `VALIDATED`, corresponde al estado legacy `VAL` (etiqueta `VALIDADO`).
-No es un estado inventado; es una representacion legible usada en el contrato tecnico y documental.
-
-Evidencia legacy (archivo de recursos):
-
-1. `codigo.estado.reposicion.pendiente = PEN`
-2. `codigo.estado.reposicion.enviado = ENV`
-3. `codigo.estado.reposicion.validado = VAL`
-4. `codigo.estado.reposicion.chequeEmitido = CHE`
-5. `codigo.estado.reposicion.pagado = PAG`
-
-Evidencia migrado (mapeo tecnico):
-
-1. `STATUS_CODE_SENT = ENV`
-2. `STATUS_CODE_VALIDATED = VAL`
-3. `STATUS_CODE_PAID = PAG`
-4. `STATUS_CODE_ISSUED = CHE`
-5. Enum de dominio: `PENDING, SENT, VALIDATED, PAID, ISSUED, COLLECTED, CANCELLED`
-
-Regla para historias y QA:
-
-1. En texto funcional se puede usar `Validado/VALIDATED`.
-2. En persistencia/filtro legacy usar codigo `VAL`.
-3. En evidencias de prueba, reportar ambos: nombre legible y codigo.
-
-## 12.2 Alcance real ya implementado (evitar retrabajo)
-
-Antes de abrir desarrollo nuevo, validar si la capacidad ya existe en shared:
-
-1. `POST /api/v1/replenishments/findByFilter`
-2. `GET /api/v1/replenishments/{replenishmentId}`
-3. `GET /api/v1/replenishments/{replenishmentId}/details`
-4. `GET /api/v1/replenishments/billing-concepts`
-5. `POST /api/v1/replenishments/{replenishmentId}/details/validate-add`
-6. `POST /api/v1/replenishments/details/validate-add`
-
-Decision vigente:
-
-1. H1/H2 consumen estos endpoints por defecto.
-2. Solo crear wrapper en `replenishment-reviews` cuando exista brecha funcional validada.
-
-## 12.3 Mapa tecnico exacto de archivos a tocar
-
-Para historias con backend nuevo (H3-H9), usar este mapa minimo:
-
-1. Capa controller:
-   `gtf-replacements-services/src/main/java/ec/com/smx/gtf/replacements/controller/replenishment-reviews/ReplenishmentReviewController.java`
-2. Capa servicio/reglas:
-   `gtf-replacements-core/src/main/java/ec/com/smx/gtf/replacements/replenishment/service/`
-3. Capa repositorio/querydsl:
-   `gtf-replacements-core/src/main/java/ec/com/smx/gtf/replacements/replenishment/repository/`
-4. Capa contratos VO/DTO:
-   `gtf-replacements-vo/src/main/java/ec/com/smx/gtf/replacements/vo/replenishment/`
-5. Tests controller:
-   `gtf-replacements-services/src/test/java/ec/com/smx/gtf/replacements/controller/`
-6. Tests servicio/repositorio:
-   `gtf-replacements-core/src/test/java/ec/com/smx/gtf/replacements/replenishment/`
-7. Documentacion obligatoria:
-   Bruno en `GTF-DOC/REPLACEMENTS-REVIEWS` + registro en `docs/apis`.
-
-## 12.4 Formato de subtarea Jira (plantilla obligatoria)
-
-Usar esta plantilla para cada subtarea tecnica:
-
-1. Objetivo tecnico:
-   describir exactamente la regla o capacidad a implementar.
-2. Entradas:
-   payload, parametros, estado inicial y rol esperado.
-3. Salidas:
-   respuesta esperada, cambio de estado y side effects.
-4. Archivos a tocar:
-   listar rutas exactas (controller/service/repository/vo/test).
-5. Criterios de aceptacion:
-   casos OK + casos de error + contrato `errors[]`.
-6. Evidencia de cierre:
-   pruebas ejecutadas, request Bruno y actualizacion de docs/apis.
-
-## 12.5 Checklist de ejecucion por historia (para onboarding)
-
-Aplicar en cada historia E2-H1..E2-H10:
-
-1. Confirmar si es reuso o desarrollo nuevo.
-2. Confirmar estados permitidos (nombre legible + codigo legacy).
-3. Confirmar validaciones obligatorias de negocio.
-4. Implementar pruebas antes de cerrar subtarea.
-5. Publicar evidencia en Bruno y `docs/apis`.
-6. Registrar avance en este documento y en bitacora de prompts.
-
-## 12.6 Matriz historia -> que tocar exactamente
-
-| Historia | Que hacer exactamente                                                 | Archivos minimos a tocar                                                                        | Resultado esperado                            |
-| -------- | --------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | --------------------------------------------- |
-| E2-H1    | Validar reuso de filtro shared y abrir wrapper solo si hay gap        | `ReplenishmentController` (lectura), tests de contrato, Bruno shared                            | Evidencia de consumo H1 sin regresion         |
-| E2-H2    | Validar reuso de lectura shared (cabecera/detalle) y flags operativos | `ReplenishmentController` (lectura), tests de lectura, Bruno shared                             | Evidencia de apertura para Revision           |
-| E2-H3    | Crear endpoint de ajuste por detalle + reglas + recalculo             | `ReplenishmentReviewController`, servicio de revision, repositorio de detalle, VO ajuste, tests | Ajuste persistido con auditoria y recalculo   |
-| E2-H4    | Crear endpoint de validar reposicion revisada                         | `ReplenishmentReviewController`, servicio de validacion, tests de estado                        | Transicion a `VAL` con reglas de precondicion |
-| E2-H5    | Crear endpoint de anular reposicion en revision                       | `ReplenishmentReviewController`, servicio de anulacion, VO anulacion, tests                     | Anulacion con motivo obligatorio y auditoria  |
-| E2-H6    | Implementar scheduler de cierre contable                              | job/scheduler en core, servicio de cierre, pruebas de integracion                               | Transicion `VAL -> PAG/CHE` idempotente       |
-| E2-H7    | Reusar consulta de conceptos + crear cambio de concepto               | endpoint shared de conceptos + endpoint nuevo en revision, servicio de ajuste concepto, tests   | Cambio de concepto trazable por linea         |
-| E2-H8    | Crear validaciones de retencion manual/electronica                    | endpoints de revision, VO retencion, servicio de validacion, tests                              | Retencion validada con control documental     |
-| E2-H9    | Crear carga/reemplazo de archivo soporte                              | endpoint de revision, servicio de archivos, regla huella, tests                                 | Soporte persistido con validaciones           |
-| E2-H10   | Cerrar decision de alcance de Gastos Personales                       | Jira + documentacion funcional + trazabilidad en este MD                                        | Decision formal aprobada y sin ambiguedad     |
-
-Notas operativas para esta matriz:
-
-1. Cuando la fila diga "reuso", no abrir desarrollo nuevo si no existe brecha funcional demostrada.
-2. Cuando la fila diga "endpoint nuevo", incluir siempre: controller + servicio + test + Bruno + docs/apis.
-3. Todo cambio de estado debe reportar codigo legacy y nombre legible en evidencia de QA.

@@ -5,25 +5,9 @@ meta {
 }
 
 post {
-  url: {{host}}/gtfReplacementsServices/api/v1/replenishment-management/34848/details
+  url: {{host}}/gtfReplacementsServices/api/v1/replenishment-management/39987/details
   body: json
   auth: inherit
-}
-
-vars:pre-request {
-  detailDocumentNumberOne:
-  detailDocumentNumberTwo:
-}
-
-script:pre-request {
-  const documentPrefix = '001-001-';
-  const numericSeed = Number(String(Date.now()).slice(-8));
-
-  const firstDocumentNumber = `${documentPrefix}${String(numericSeed).padStart(8, '0')}`;
-  const secondDocumentNumber = `${documentPrefix}${String(numericSeed + 1).padStart(8, '0')}`;
-
-  bru.setVar('detailDocumentNumberOne', firstDocumentNumber);
-  bru.setVar('detailDocumentNumberTwo', secondDocumentNumber);
 }
 
 body:json {
@@ -31,7 +15,7 @@ body:json {
     {
       "documentType": "FAC",
       "taxId": "1790016919001",
-      "documentNumber": "{{detailDocumentNumberOne}}",
+      "documentNumber": "006-012-000149434",
       "documentDate": 1783684800000,
       "observation": "Detalle batch 1",
       "requestedValue": 50.0,
@@ -41,7 +25,7 @@ body:json {
     {
       "documentType": "FAC",
       "taxId": "1790016919001",
-      "documentNumber": "{{detailDocumentNumberTwo}}",
+      "documentNumber": "006-012-000149434",
       "documentDate": 1783684800000,
       "observation": "Detalle batch 2",
       "requestedValue": 49.0,
@@ -49,6 +33,22 @@ body:json {
       "billingConceptSequence": 1
     }
   ]
+}
+
+vars:pre-request {
+  detailDocumentNumberOne: 
+  detailDocumentNumberTwo: 
+}
+
+script:pre-request {
+  const documentPrefix = '001-001-';
+  const numericSeed = Number(String(Date.now()).slice(-8));
+  
+  const firstDocumentNumber = `${documentPrefix}${String(numericSeed).padStart(8, '0')}`;
+  const secondDocumentNumber = `${documentPrefix}${String(numericSeed + 1).padStart(8, '0')}`;
+  
+  bru.setVar('detailDocumentNumberOne', firstDocumentNumber);
+  bru.setVar('detailDocumentNumberTwo', secondDocumentNumber);
 }
 
 settings {
@@ -59,14 +59,33 @@ settings {
 docs {
   ## Objetivo
   Crear lineas de detalle en lote para una reposicion existente.
+
+  ## Metodo y ruta
+  - Metodo: `POST`
+  - Ruta: `/api/v1/replenishment-management/{replenishmentId}/details`
   
   ## Pantalla Front
   Administracion de Reposiciones -> Tabla detalle -> Guardar varias filas.
+
+  ## Cuando usarlo
+  - Al confirmar carga de varias filas nuevas en una sola accion.
+  - Recomendado cuando Front ya prevalido cada fila con `validate-add`.
   
   ## Parametros
   - Path `replenishmentId`.
   - Body array de lineas de detalle.
   - `documentNumber` se genera automaticamente en pre-request script con variables `detailDocumentNumberOne` y `detailDocumentNumberTwo`.
+
+  ## Reglas funcionales clave
+  - Validacion de repetidos en este endpoint: solo dentro del arreglo enviado.
+  - Clave de repetido en lote: `taxId + documentNumber`.
+  - No se valida duplicado simple contra base de datos en este endpoint de management batch.
+  - Comportamiento transaccional: todo o nada (si una fila falla, no se persiste el lote).
+
+  ## Prioridad recomendada de lectura en Front
+  1. Si `message` indica errores de validacion, mostrar `errors[]` por fila y no refrescar grilla.
+  2. Si exito, usar `data[]` para refrescar tabla con `detailId` persistidos.
+  3. Mantener `detailId` como clave tecnica de futuras ediciones/eliminaciones.
   
   ## Respuesta esperada
   Lista de lineas registradas con ids de detalle y valores persistidos.

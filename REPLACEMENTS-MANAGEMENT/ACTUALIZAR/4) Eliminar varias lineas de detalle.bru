@@ -104,8 +104,15 @@ docs {
   ## Objetivo
   Eliminar varias lineas de detalle de reposicion en una sola solicitud, aplicando eliminacion logica (soft delete).
 
+  ## Metodo y ruta
+  - Metodo: `POST`
+  - Ruta: `/api/v1/replenishment-management/{replenishmentId}/details/delete`
+
   ## Pantalla Front
   Administracion de Reposiciones -> Tabla detalle -> Eliminar varias filas.
+
+  ## Cuando usarlo
+  - Al ejecutar eliminacion masiva desde seleccion multiple en grilla.
 
   ## Parametros
   - Path `replenishmentId` (obligatorio): identificador de la cabecera.
@@ -115,6 +122,11 @@ docs {
   - Exito: `message=OK` y `data` con la lista de ids eliminados logicamente.
   - Bloqueo funcional: `message` con motivo (cabecera no pendiente, detalle inexistente o lista vacia).
   - Nota: al finalizar, backend recalcula una sola vez los totales de cabecera con detalles activos.
+
+  ## Prioridad recomendada de lectura en Front
+  1. Si `message` indica exito, retirar filas listadas en `data[].detailId`.
+  2. Si error funcional, mostrar `message` y conservar seleccion para correccion.
+  3. Refrescar totales al finalizar.
 
   ## Mapeo de campos API -> pantalla Front
   - `message` -> toast o banner de resultado de eliminacion.

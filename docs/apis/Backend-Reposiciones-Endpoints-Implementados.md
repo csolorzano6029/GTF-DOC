@@ -1187,8 +1187,22 @@ Notas:
 - Si `currentRequestedTotal` no llega, backend calcula el total actual desde detalle persistido de la reposicion.
 - Requiere que la cabecera exista y este en estado pendiente.
 - Reutiliza reglas de detalle: obligatorios, IVA, duplicado y maximo por documento.
-- Para `transactionCode = "1"` aplica reglas operativas de fondo: saldo disponible, bloqueo por porcentaje y `sendAlert`.
+- Para `transactionCode = "1"` aplica reglas operativas de fondo: saldo disponible, bloqueo por porcentaje y alerta preventiva.
 - Cuando falla una regla de negocio, `message` retorna un texto generico y el detalle de errores se entrega en `errors` (nivel raiz de `BaseResponseVo`).
+
+Semantica de `data`:
+
+- `valid = true`: la fila cumple reglas y se puede agregar.
+- `valid = false`: existe al menos una regla incumplida; revisar `errors[]`.
+- `blockedByAvailableBalance = true`: el total proyectado (`currentRequestedTotal + requestedValue`) supera el saldo disponible (`cashBalance`).
+- `blockedByUsagePercentage = true`: el total proyectado supera el umbral maximo de consumo (`usagePercentage`) sobre el fondo asignado.
+- `sendAlert = true`: no bloquea; es advertencia de envio recomendado porque se supero el umbral de alerta (`alertPercentage`) sin reglas bloqueantes.
+
+Orden recomendado en front:
+
+1. Si `valid = false`, bloquear agregado y mostrar `errors[]`.
+2. Si `blockedByAvailableBalance` o `blockedByUsagePercentage` estan en `true`, tratar como bloqueo de negocio.
+3. Si `valid = true` y `sendAlert = true`, permitir agregar fila y mostrar advertencia visual.
 
 ### Response valida (200)
 
@@ -1280,12 +1294,31 @@ Notas:
 
 - `workAreaCode` es obligatorio.
 - `transactionCode` es opcional; si no llega se asume `"1"`.
-- Si llega `transactionCode` debe ser `"1"` o `"2"`.
+- Si llega `transactionCode` debe ser `"1"`.
 - En `detail` son obligatorios: `billingConceptSequence`, `documentType`, `documentDate`, `requestedValue` y `vatValue`.
 - No requiere `replenishmentId`; pensado para filas temporales en UI antes de crear cabecera.
 - Valida duplicado por `companyCode + taxId + documentNumber` contra datos existentes.
 - El endpoint aplica Bean Validation de entrada (`@Valid`): errores de campos requeridos/vacios retornan HTTP 400 antes de ejecutar reglas de negocio.
 - En errores de negocio, `message` es generico y los mensajes puntuales se entregan en `errors` (nivel raiz de `BaseResponseVo`).
+
+Semantica de `data`:
+
+- `valid = true`: la fila cumple reglas y se puede agregar.
+- `valid = false`: existe al menos una regla incumplida; revisar `errors[]`.
+- `blockedByAvailableBalance = true`: el total proyectado (`currentRequestedTotal + requestedValue`) supera el saldo disponible (`cashBalance`).
+- `blockedByUsagePercentage = true`: el total proyectado supera el umbral maximo de consumo (`usagePercentage`) sobre el fondo asignado.
+- `sendAlert = true`: no bloquea; es advertencia de envio recomendado porque se supero el umbral de alerta (`alertPercentage`) sin reglas bloqueantes.
+
+Regla de alcance:
+
+- Las banderas `blockedByAvailableBalance`, `blockedByUsagePercentage` y `sendAlert` aplican cuando `transactionCode = "1"` (Caja Chica).
+- Si `transactionCode` no es soportado, el endpoint retorna error funcional y `valid = false`.
+
+Orden recomendado en front:
+
+1. Si `valid = false`, bloquear agregado y mostrar `errors[]`.
+2. Si `blockedByAvailableBalance` o `blockedByUsagePercentage` estan en `true`, tratar como bloqueo de negocio.
+3. Si `valid = true` y `sendAlert = true`, permitir agregar fila y mostrar advertencia visual.
 
 ### Response valida (200)
 
@@ -1320,11 +1353,10 @@ Casos tipicos que devuelven 400 en este endpoint:
 - `detail.documentDate` nulo.
 - `detail.requestedValue` nulo.
 - `detail.vatValue` nulo.
-- `transactionCode` distinto de `1` o `2`.
 
 ### Response invalida de negocio (200)
 
-Cuando el request es valido a nivel de estructura, pero falla una o varias reglas de negocio (IVA, maximo por documento, porcentaje, saldo, duplicado), el endpoint mantiene `code: 200`, retorna `message` generico y acumula el detalle en `errors` (nivel raiz).
+Cuando el request es valido a nivel de estructura, pero falla una o varias reglas de negocio (IVA, maximo por documento, porcentaje, saldo, duplicado o `transactionCode` no soportado), el endpoint mantiene `code: 200`, retorna `message` generico y acumula el detalle en `errors` (nivel raiz).
 
 Ejemplo:
 

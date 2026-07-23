@@ -18,12 +18,30 @@ settings {
 docs {
   ## Objetivo
   Consultar la cabecera de una reposicion especifica.
+
+  ## Metodo y ruta
+  - Metodo: `GET`
+  - Ruta: `/api/v1/replenishments/{replenishmentId}`
   
   ## Pantalla Front
   Administracion de Reposiciones -> Abrir reposicion (cabecera).
+
+  ## Cuando usarlo
+  - Al abrir una reposicion desde la grilla.
+  - Al refrescar datos de cabecera tras create/update/send.
   
   ## Parametros
   - Path `replenishmentId` (obligatorio).
+
+  ## Reglas funcionales clave
+  - Retorna informacion de cabecera, no la lista de detalles.
+  - Si se requiere detalle, consumir endpoint dedicado `/replenishments/{id}/details`.
+  - Totales monetarios y estado llegan listos para pintar en UI.
+
+  ## Prioridad recomendada de lectura en Front
+  1. `data.replenishmentStatus` y `data.replenishmentStatusName` para habilitar/deshabilitar acciones.
+  2. Totales (`requestedSubtotal`, `vatTotal`, `requestedTotal`) para resumen financiero.
+  3. Responsable y local para encabezado de formulario.
   
   ## Respuesta esperada
   Cabecera completa de la solicitud seleccionada.
@@ -39,7 +57,4 @@ docs {
   - `requestedSubtotal`, `vatTotal`, `requestedTotal` -> Subtotal/IVA/Total.
   - `sendAlert` -> Alerta visual de envio.
   - `unsentDocumentsTotal` -> Documentos no enviados.
-  
-  ## Nota
-  El detalle se consulta aparte en `/replenishments/{id}/details`.
 }

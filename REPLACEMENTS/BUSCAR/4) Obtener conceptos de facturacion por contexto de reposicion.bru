@@ -5,15 +5,15 @@ meta {
 }
 
 get {
-  url: {{host}}/gtfReplacementsServices/api/v1/replenishments/billing-concepts?workAreaCode=186&documentType=FAC&transactionCode=1
+  url: {{host}}/gtfReplacementsServices/api/v1/replenishments/billing-concepts?documentType=FAC
   body: none
   auth: inherit
 }
 
 params:query {
-  workAreaCode: 186
   documentType: FAC
-  transactionCode: 1
+  ~workAreaCode: 186
+  ~transactionCode: 1
 }
 
 settings {
@@ -24,14 +24,32 @@ settings {
 docs {
   ## Objetivo
   Obtener conceptos de facturacion del contexto de reposicion, agrupados por categoria.
+
+  ## Metodo y ruta
+  - Metodo: `GET`
+  - Ruta: `/api/v1/replenishments/billing-concepts`
   
   ## Pantalla Front
   Administracion de Reposiciones -> Selector de concepto -> Abrir popup concepto.
+
+  ## Cuando usarlo
+  - Al seleccionar tipo de documento en detalle.
+  - Al abrir popup/lista de conceptos para una fila.
   
   ## Parametros
   - Query `workAreaCode` (obligatorio).
   - Query `documentType` (obligatorio).
   - Query `transactionCode` (opcional, default `1`).
+
+  ## Reglas funcionales clave
+  - Backend agrupa la respuesta por categoria para consumo directo en UI.
+  - Si no existe configuracion para el contexto, retorna arreglo vacio.
+  - El contrato actual esta orientado a transaccion `1` (Caja Chica).
+
+  ## Prioridad recomendada de lectura en Front
+  1. Iterar categorias (`categoryCode`, `categoryName`).
+  2. Dentro de cada categoria, usar `concepts[]` para poblar items seleccionables.
+  3. Guardar `billingConceptSequence` como valor tecnico de la fila.
   
   ## Respuesta esperada
   Arreglo de categorias con lista de conceptos disponibles para seleccion.

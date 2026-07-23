@@ -11,55 +11,10 @@ post {
 }
 
 body:json {
-  /* {
-      "filters": [
-          {
-              "alias": null,
-              "parameterPattern": "workAreaCode",
-              "dataType": "integer",
-              "parameterValue": 156,
-              "parameterValues": [],
-              "selectedOption": "uv",
-              "operatorOR": false,
-              "comparatorTypeEnum": "Igual",
-              "insensitive": false,
-              "rangeBean": null
-          },
-          {
-              "alias": null,
-              "parameterPattern": "replenishmentStatus",
-              "dataType": "string",
-              "parameterValue": "PAG",
-              "parameterValues": [],
-              "selectedOption": "uv",
-              "operatorOR": false,
-              "comparatorTypeEnum": "Igual",
-              "insensitive": false,
-              "rangeBean": null
-          }
-      ],
-      "page": 0,
-      "size": 10
-  } */
-  
-  
   {
-      "filters": [
-         {
-              "alias": null,
-              "parameterPattern": "workAreaCode",
-              "dataType": "numeric",
-              "parameterValue": "22422",
-              "parameterValues": [],
-              "selectedOption": "uv",
-              "operatorOR": false,
-              "comparatorTypeEnum": "Igual",
-              "insensitive": false,
-              "rangeBean": null
-          }
-      ],
-      "page": 0,
-      "size": 30
+    "filters": [],
+    "page": 0,
+    "size": 15
   }
 }
 
@@ -71,18 +26,38 @@ settings {
 docs {
   ## Objetivo
   Buscar reposiciones para la grilla principal con filtros y paginacion.
+
+  ## Metodo y ruta
+  - Metodo: `POST`
+  - Ruta: `/api/v1/replenishments/findByFilter`
   
   ## Pantalla Front
   Administracion de Reposiciones -> Lista de reposiciones -> Buscar.
+
+  ## Cuando usarlo
+  - Carga inicial de pantalla.
+  - Cambio de filtros.
+  - Cambio de pagina/tamano.
   
   ## Parametros
   - Body `filters`: criterios SearchModelDTO.
   - Body `page`: pagina base 0.
   - Body `size`: tamano de pagina.
+
+  ## Reglas funcionales clave
+  - API responde contrato estandar (`code/message/errors/data`) con HTTP 200.
+  - `data` es paginado; las filas vienen en `data.content`.
+  - El area de trabajo se toma del contexto de usuario en backend para el alcance de resultados.
+  - Si no hay resultados, `data.content` llega vacio.
   
   ## Valores de referencia
   - Estados: `PEN`, `ENV`, `VAL`, `PAG`, `CHE`, `COB`, `ANU`.
   - Comparador recomendado: `Igual`.
+
+  ## Prioridad recomendada de lectura en Front
+  1. Renderizar filas desde `data.content`.
+  2. Usar `data.totalElements`, `data.totalPages`, `data.number`, `data.size` para paginador.
+  3. Usar `sendAlert` solo como indicador visual no bloqueante.
   
   ## Respuesta esperada
   `data.content` con filas de reposicion y metadatos de paginacion.

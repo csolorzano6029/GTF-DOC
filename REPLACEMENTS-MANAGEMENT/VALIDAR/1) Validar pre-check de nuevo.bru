@@ -11,9 +11,7 @@ post {
 }
 
 body:json {
-  {
-    "workAreaCode": 2921
-  }   
+  {"workAreaCode":186,"transactionCode":"1"}
 }
 
 settings {
@@ -24,13 +22,34 @@ settings {
 docs {
   ## Objetivo
   Ejecutar prevalidaciones antes de crear una nueva reposicion.
+
+  ## Metodo y ruta
+  - Metodo: `POST`
+  - Ruta: `/api/v1/replenishment-management/validate-new`
   
   ## Pantalla Front
   Administracion de Reposiciones -> Precheck de Nuevo.
+
+  ## Cuando usarlo
+  - Al dar clic en Nuevo antes de abrir formulario de cabecera.
+  - Al cambiar de local/area para validar restricciones operativas.
   
   ## Parametros
   - `workAreaCode` (obligatorio).
-  - `transactionCode` (`1`/`2`, opcional).
+  - `transactionCode` (opcional; en el alcance actual se opera con `1`).
+
+  ## Reglas funcionales clave
+  - `data.valid = true` habilita crear cabecera.
+  - `data.pendingReplenishment = true` bloquea por reposicion pendiente existente.
+  - `data.issuedCheckReplenishment = true` bloquea por cheque emitido pendiente de gestion.
+  - `data.initialFundLoadRequired = true` bloquea hasta regularizar carga inicial de fondo.
+  - `data.transactionSelectionRequired` y `data.supportedTransactionCodes` informan soporte vigente de transaccion.
+
+  ## Prioridad recomendada de lectura en Front
+  1. Revisar `data.valid`.
+  2. Si `false`, identificar bandera de bloqueo (`pendingReplenishment`, `issuedCheckReplenishment`, `initialFundLoadRequired`).
+  3. Mostrar `message` como motivo funcional principal.
+  4. Si `true`, continuar flujo de creacion.
   
   ## Respuesta esperada
   Banderas de control para habilitar flujo nuevo o bloquear por regla operativa.
@@ -38,7 +57,7 @@ docs {
   ## Mapeo de campos API -> pantalla Front
   - `data.valid` -> habilita crear nueva cabecera.
   - `data.transactionSelectionRequired` -> mostrar selector de tipo transaccion.
-  - `data.supportedTransactionCodes` -> opciones permitidas en combo (`1`,`2`).
+  - `data.supportedTransactionCodes` -> opciones permitidas en combo (actualmente `1`).
   - `data.issuedCheckReplenishment` -> bloqueo por cheque emitido.
   - `data.pendingReplenishment` -> bloqueo por pendiente en caja chica.
   - `data.initialFundLoadRequired` -> exigir flujo de carga inicial de fondos.

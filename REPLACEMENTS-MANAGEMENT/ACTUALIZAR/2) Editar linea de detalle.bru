@@ -5,7 +5,7 @@ meta {
 }
 
 post {
-  url: {{host}}/gtfReplacementsServices/api/v1/replenishment-management/34848/details/691877
+  url: {{host}}/gtfReplacementsServices/api/v1/replenishment-management/39996/details/768013
   body: json
   auth: inherit
 }
@@ -13,8 +13,8 @@ post {
 body:json {
   {
     "documentType": "FAC",
-    "taxId": "1790016919001",
-    "documentNumber": "001-001-000532347",
+    "taxId": "1103264071001",
+    "documentNumber": "006-012-000149434",
     "documentDate": 1782968392000,
     "observation": "Compra de insumos - ajuste",
     "requestedValue": 21.00,
@@ -32,14 +32,31 @@ settings {
 docs {
   ## Objetivo
   Editar una linea de detalle ya registrada.
+
+  ## Metodo y ruta
+  - Metodo: `POST`
+  - Ruta: `/api/v1/replenishment-management/{replenishmentId}/details/{detailId}`
   
   ## Pantalla Front
   Administracion de Reposiciones -> Tabla detalle -> Editar fila.
+
+  ## Cuando usarlo
+  - Al guardar cambios sobre una fila existente.
   
   ## Parametros
   - Path `replenishmentId`.
   - Path `detailId`.
   - Body con cambios de la linea.
+
+  ## Reglas funcionales clave
+  - Solo permite edicion cuando la cabecera esta en estado pendiente.
+  - Backend vuelve a ejecutar validaciones funcionales de detalle antes de persistir.
+  - Si la regla no se cumple, responde mensaje funcional y no guarda cambios.
+
+  ## Prioridad recomendada de lectura en Front
+  1. Revisar `message` para confirmar edicion o mostrar bloqueo.
+  2. Si exito, refrescar fila con `data` retornado.
+  3. Mantener `detailId` y `replenishmentId` como llaves de navegacion.
   
   ## Respuesta esperada
   Detalle actualizado (`data`) o mensaje funcional en caso de bloqueo.

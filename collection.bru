@@ -24,7 +24,6 @@ script:pre-request {
       'Cookie': 'KEYCLOAK_LOCALE=es',
       'Content-Type': 'application/x-www-form-urlencoded'
     },
-    // Solución: Enviamos los parámetros directamente como un string URL-encoded
     data: 'grant_type=password&client_id=GTF-WEB&username=cescobar&password=Password01.'
   };
   
@@ -34,12 +33,12 @@ script:pre-request {
       
     if (jsonData.access_token) {
       bru.setVar("access_token", jsonData.access_token);
-      console.log("Token generado y guardado exitosamente.");
+      console.log("Token de servicio generado y guardado exitosamente.");
+      console.log("Access Token:", jsonData.access_token);
     } else {
       console.log("No se pudo obtener el token. Respuesta:", jsonData);
     }
   } catch (error) {
-    // Manejo de error mejorado para ver detalles del fallo si ocurre
     console.log("Error al solicitar el token:", error.response ? error.response.data : error.message);
   }
 }

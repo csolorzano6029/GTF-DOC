@@ -12,8 +12,8 @@ post {
 
 body:json {
   {
-    "taxId": "1790016919001",
-    "documentNumber": "001-001-000013779"
+    "taxId": "1103264071001",
+    "documentNumber": "006-012-000149434"
   }
 }
 
@@ -24,18 +24,40 @@ settings {
 
 docs {
   ## Objetivo
-  Validar no duplicidad de documento por RUC + numero.
+  Validar no duplicidad de documento por par RUC + numero de documento.
 
+  ## Metodo y ruta
+  - Metodo: `POST`
+  - Ruta: `/api/v1/replenishments/validate-duplicate`
+  
   ## Pantalla Front
   Administracion de Reposiciones -> Formulario detalle -> Validar duplicado.
 
+  ## Cuando usarlo
+  - Antes de persistir una fila en create/update de detalle.
+  - Como validacion rapida de documento previo al guardado.
+  
   ## Parametros
-  - `taxId`.
-  - `documentNumber`.
+  - `taxId` (obligatorio): RUC del proveedor.
+  - `documentNumber` (obligatorio): numero documental.
 
+  ## Reglas funcionales clave
+  - `data.duplicate = true` indica documento ya registrado para la combinacion RUC + numero.
+  - `data.valid = false` cuando existe duplicado.
+  - `data.valid = true` cuando no existe duplicado y se puede continuar.
+  - Esta API evalua duplicidad simple; para validaciones mas amplias de fila se usa `validate-add`.
+
+  ## Nota importante
+  Esta validacion no reemplaza la deteccion de repetidos dentro del arreglo en cargas batch de management.
+  
   ## Respuesta esperada
   Resultado con `duplicate` y `valid` para decision de UI.
 
+  ## Prioridad recomendada de lectura en Front
+  1. Revisar `data.duplicate`.
+  2. Si `true`, bloquear guardado y mostrar `message`.
+  3. Si `false`, continuar validaciones restantes (IVA, reglas de fondo, etc).
+  
   ## Mapeo de campos API -> pantalla Front
   - `data.duplicate` -> indicador directo de documento repetido.
   - `data.valid` -> habilita/bloquea guardado de fila.

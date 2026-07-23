@@ -14,7 +14,7 @@ body:json {
   {
     "workAreaCode": 252,
     "observation": "Actualizacion cabecera 2",
-    "transactionCode": "2"
+    "transactionCode": "1"
   }
 }
 
@@ -26,13 +26,30 @@ settings {
 docs {
   ## Objetivo
   Actualizar datos de cabecera de una reposicion en estado pendiente.
+
+  ## Metodo y ruta
+  - Metodo: `POST`
+  - Ruta: `/api/v1/replenishment-management/{replenishmentId}`
   
   ## Pantalla Front
   Administracion de Reposiciones -> Formulario cabecera -> Guardar cambios.
+
+  ## Cuando usarlo
+  - Al confirmar cambios de cabecera (observacion, responsable, contexto permitido).
   
   ## Parametros
   - Path `replenishmentId` (obligatorio).
   - Body parcial con campos editables.
+
+  ## Reglas funcionales clave
+  - Solo aplica cuando la reposicion esta en estado pendiente.
+  - Si el estado no permite edicion, backend responde mensaje funcional de bloqueo.
+  - Si el payload llega parcial, backend conserva campos no enviados.
+
+  ## Prioridad recomendada de lectura en Front
+  1. Revisar `message` para feedback inmediato.
+  2. Si exito, repintar cabecera desde `data`.
+  3. Revalidar habilitacion de acciones con `data.replenishmentStatus`.
   
   ## Respuesta esperada
   Cabecera actualizada con valores consolidados por backend.

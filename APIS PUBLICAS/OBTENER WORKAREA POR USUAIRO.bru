@@ -1,0 +1,24 @@
+meta {
+  name: OBTENER WORKAREA POR USUAIRO
+  type: http
+  seq: 3
+}
+
+get {
+  url: https://aplpre.favorita.ec/admLogin/api/v1/menu/session.json?callback=JSONP_CALLBACK&userId=FRM2698&companyId=1&profileId=253&systemId=GTFV2
+  body: none
+  auth: inherit
+}
+
+params:query {
+  callback: JSONP_CALLBACK
+  userId: FRM2698
+  companyId: 1
+  profileId: 253
+  systemId: GTFV2
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

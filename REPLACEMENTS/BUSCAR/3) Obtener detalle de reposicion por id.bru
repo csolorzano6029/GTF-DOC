@@ -18,12 +18,30 @@ settings {
 docs {
   ## Objetivo
   Consultar lineas de detalle de una reposicion.
+
+  ## Metodo y ruta
+  - Metodo: `GET`
+  - Ruta: `/api/v1/replenishments/{replenishmentId}/details`
   
   ## Pantalla Front
   Administracion de Reposiciones -> Tabla de detalle -> Cargar detalle.
+
+  ## Cuando usarlo
+  - Al abrir reposicion para editar/consultar.
+  - Al refrescar tabla luego de create/update/delete de detalle.
   
   ## Parametros
   - Path `replenishmentId` (obligatorio).
+
+  ## Reglas funcionales clave
+  - Retorna detalle activo de la reposicion solicitada.
+  - Cada fila trae `detailId` para operaciones puntuales (editar/eliminar).
+  - Incluye campos enriquecidos para evitar resoluciones adicionales en Front.
+
+  ## Prioridad recomendada de lectura en Front
+  1. Renderizar tabla desde `data[]`.
+  2. Usar `detailId` como llave tecnica de acciones de fila.
+  3. Mostrar descripciones (`documentTypeName`, `billingConceptDescription`, `measurementUnitName`) cuando existan.
   
   ## Respuesta esperada
   Lista `ReplenishmentDetailVo` con campos documentales, concepto y valores.

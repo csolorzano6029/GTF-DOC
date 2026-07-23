@@ -12,8 +12,8 @@ post {
 
 body:json {
   {
-    "documentTotal": 200.0,
-    "vatValue": 20.0
+    "documentTotal": 100.0,
+    "vatValue": 15.0
   }
 }
 
@@ -24,21 +24,43 @@ settings {
 
 docs {
   ## Objetivo
-  Validar IVA del documento contra la regla de calculo permitida.
+  Validar IVA del documento contra la regla de calculo permitida antes de guardar/editar una fila de detalle.
 
+  ## Metodo y ruta
+  - Metodo: `POST`
+  - Ruta: `/api/v1/replenishments/validate-vat`
+  
   ## Pantalla Front
   Administracion de Reposiciones -> Formulario detalle -> Validar IVA.
 
+  ## Cuando usarlo
+  - Al agregar una nueva fila de detalle.
+  - Al editar una fila ya existente si cambia total o IVA.
+  
   ## Parametros
-  - `documentTotal`.
-  - `vatValue`.
+  - `documentTotal` (obligatorio): total del documento.
+  - `vatValue` (obligatorio): IVA ingresado por usuario.
 
+  ## Reglas funcionales clave
+  - `data.valid = true` cuando el IVA cumple reglas de negocio.
+  - `data.valid = false` cuando el IVA excede lo permitido o incumple validaciones del total.
+  - `data.maxAllowedVat` expone el limite maximo calculado por backend para guiar correccion en UI.
+
+  ## Prioridad recomendada de lectura en Front
+  1. Revisar `data.valid`.
+  2. Si `false`, mostrar `message` y usar `data.maxAllowedVat` para sugerir valor permitido.
+  3. Si `true`, permitir continuar flujo normal.
+  
   ## Respuesta esperada
   Resultado de validacion con bandera `valid` y limite `maxAllowedVat`.
-
+  
   ## Mapeo de campos API -> pantalla Front
   - `data.valid` -> habilita o bloquea continuar con la fila.
   - `data.maxAllowedVat` -> referencia para corregir IVA ingresado.
   - `data.documentTotal` y `data.vatValue` -> eco de valores evaluados.
   - `message` -> texto de validacion para mostrar al usuario.
+
+  ## Mensajes funcionales frecuentes
+  - Exceso de IVA frente al limite calculado.
+  - IVA mayor o igual al total del documento.
 }

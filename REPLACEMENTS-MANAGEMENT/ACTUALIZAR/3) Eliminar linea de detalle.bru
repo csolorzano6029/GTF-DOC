@@ -18,9 +18,16 @@ settings {
 docs {
   ## Objetivo
   Eliminar una linea de detalle de reposicion de forma logica (soft delete) cuando la cabecera esta en estado pendiente.
+
+  ## Metodo y ruta
+  - Metodo: `POST`
+  - Ruta: `/api/v1/replenishment-management/{replenishmentId}/details/{detailId}/delete`
   
   ## Pantalla Front
   Administracion de Reposiciones -> Tabla detalle -> Accion Eliminar fila.
+
+  ## Cuando usarlo
+  - Al confirmar eliminacion individual desde la grilla de detalle.
   
   ## Parametros
   - Path `replenishmentId` (obligatorio): identificador de la cabecera.
@@ -31,6 +38,11 @@ docs {
   - Exito: `message=OK` y `data` con ids de la linea eliminada logicamente.
   - Bloqueo funcional: `message` con motivo (cabecera no pendiente o detalle inexistente).
   - Nota: la eliminacion es logica (se marca estado inactivo) y los totales de cabecera se recalculan con los detalles activos.
+
+  ## Prioridad recomendada de lectura en Front
+  1. Revisar `message` para notificar resultado.
+  2. Si exito, retirar fila por `data.detailId`.
+  3. Refrescar totales de cabecera para mantener consistencia visual.
   
   ## Mapeo de campos API -> pantalla Front
   - `message` -> toast o banner de resultado de eliminacion.
