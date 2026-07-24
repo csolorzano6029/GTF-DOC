@@ -15,7 +15,7 @@ body:json {
     "detail": {
       "documentType": "FAC",
       "taxId": "1103264071001",
-      "documentNumber": "006-012-000149434",
+      "documentNumber": "006-012-000149430",
       "documentDate": 1783684800000,
       "billingConceptSequence": 1,
       "requestedValue": 90.0,
@@ -59,17 +59,17 @@ docs {
   - `data.sendAlert`
     - `true`: NO bloquea. Solo indica alerta preventiva de envio porque el total proyectado supera el umbral de alerta (`alertPercentage`) sin violar reglas bloqueantes.
     - `false`: no hay alerta preventiva, o existe alguna regla bloqueante.
-
+  
   ## Regla de alcance de estas banderas
   - Estas tres banderas operativas (`blockedByAvailableBalance`, `blockedByUsagePercentage`, `sendAlert`) aplican cuando `transactionCode = "1"` (Caja Chica).
   - Para otros codigos no soportados, la API responde error funcional y `valid = false`.
-
+  
   ## Prioridad recomendada de lectura en Front
   1. Si `valid = false`, no agregar fila y mostrar `errors[]`.
   2. Si `blockedByAvailableBalance = true` o `blockedByUsagePercentage = true`, tratar como bloqueo de negocio.
   3. Si `valid = true` y `sendAlert = true`, permitir agregar fila pero mostrar advertencia visual de envio recomendado.
   4. Si `valid = true` y `sendAlert = false`, continuar flujo normal.
-
+  
   ## Mapeo de campos API -> pantalla Front
   - `data.valid` -> resultado global para habilitar o bloquear agregado.
   - `data.sendAlert` -> advertencia visual no bloqueante (umbral de alerta).

@@ -1,0 +1,101 @@
+meta {
+  name: 3) Crear reposicion (cabecera + detalles)
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{host}}/gtfReplacementsServices/api/v1/replenishment-management
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "responsiblePersonDocument": "1708682446",
+    "observation": "Creacion atomica cabecera + detalle",
+    "details": [
+      {
+        "documentType": "FAC",
+        "taxId": "1790016919001",
+        "documentNumber": "{{atomicDetailDocumentNumberOne}}",
+        "documentDate": 1783684800000,
+        "observation": "Detalle atomico 1",
+        "requestedValue": 50.0,
+        "vatValue": 6.52,
+        "billingConceptSequence": 1
+      },
+      {
+        "documentType": "FAC",
+        "taxId": "1790016919001",
+        "documentNumber": "{{atomicDetailDocumentNumberTwo}}",
+        "documentDate": 1783684800000,
+        "observation": "Detalle atomico 2",
+        "requestedValue": 49.0,
+        "vatValue": 6.39,
+        "billingConceptSequence": 1
+      }
+    ]
+  }
+}
+
+vars:pre-request {
+  atomicDetailDocumentNumberOne: 
+  atomicDetailDocumentNumberTwo: 
+}
+
+script:pre-request {
+  const documentPrefix = '001-001-';
+  const numericSeed = Number(String(Date.now()).slice(-8));
+  
+  const firstDocumentNumber = `${documentPrefix}${String(numericSeed).padStart(9, '0')}`;
+  const secondDocumentNumber = `${documentPrefix}${String(numericSeed + 1).padStart(9, '0')}`;
+  
+  bru.setVar('atomicDetailDocumentNumberOne', firstDocumentNumber);
+  bru.setVar('atomicDetailDocumentNumberTwo', secondDocumentNumber);
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  ## Objetivo
+  Crear cabecera y detalles en una sola API y una sola transaccion.
+  
+  ## Metodo y ruta
+  - Metodo: `POST`
+  - Ruta: `/api/v1/replenishment-management`
+  
+  ## Pantalla Front
+  Administracion de Reposiciones -> Guardado completo (cabecera + grilla detalle) en una sola accion.
+  
+  ## Cuando usarlo
+  - Cuando Front requiera evitar cabeceras huerfanas si falla el detalle.
+  - Cuando se desea confirmar todo el registro en una sola operacion atomica.
+  
+  ## Parametros
+  - Campos de cabecera en raiz del body (mismas reglas del create de cabecera).
+  - `details`: arreglo de detalle (mismas reglas del batch de detalle).
+  
+  ## Reglas funcionales clave
+  - Se ejecuta en una sola transaccion.
+  - Si falla una validacion de detalle, se revierte tambien la cabecera.
+  - Si todo es valido, persiste cabecera y todas las lineas de detalle.
+  
+  ## Prioridad recomendada de lectura en Front
+  1. `message` para feedback global de guardado.
+  2. `errors[]` cuando falle alguna regla de negocio.
+  3. `data.replenishmentId` y `data.details[]` para refrescar estado de pantalla.
+  
+  ## Respuesta esperada
+  Retorna cabecera creada con `replenishmentId` y `details[]` persistidos.
+  
+  ## Mapeo de campos API -> pantalla Front
+  - `message` -> toast global de resultado.
+  - `errors[]` -> grilla de errores funcionales por fila/regla.
+  - `data.replenishmentId` -> id tecnico de cabecera.
+  - `data.details[].detailId` -> ids tecnicos de fila.
+  - `data.replenishmentStatus` + `data.replenishmentStatusName` -> estado visual.
+}

@@ -1757,6 +1757,111 @@ Notas:
 
 ---
 
+## 14) Crear reposicion con detalles (endpoint principal)
+
+### Resumen
+
+- Nombre: Crear cabecera y lineas de detalle en una sola API
+- Metodo: POST
+- URL: /gtfReplacementsServices/api/v1/replenishment-management
+- URL completa sugerida: {{host}}/gtfReplacementsServices/api/v1/replenishment-management
+
+### Parametros
+
+| Tipo | Nombre             | Requerido | Tipo dato | Descripcion                                                            |
+| ---- | ------------------ | --------- | --------- | ---------------------------------------------------------------------- |
+| Body | campos de cabecera | Si        | Object    | Campos de cabecera en raiz del body (mismas reglas de create cabecera) |
+| Body | details            | Si        | Array     | Lineas de detalle (mismas reglas de create details batch)              |
+
+### Request payload (ejemplo)
+
+```json
+{
+  "workAreaCode": 105,
+  "transactionCode": "1",
+  "responsiblePersonDocument": "1708682446",
+  "observation": "Creacion atomica cabecera + detalle",
+  "details": [
+    {
+      "documentType": "FAC",
+      "taxId": "1790016919001",
+      "documentNumber": "001-001-000012346",
+      "documentDate": 1783684800000,
+      "observation": "Detalle atomico 1",
+      "requestedValue": 50.0,
+      "vatValue": 6.52,
+      "billingConceptSequence": 1
+    },
+    {
+      "documentType": "FAC",
+      "taxId": "1790016919001",
+      "documentNumber": "001-001-000012347",
+      "documentDate": 1783684800000,
+      "observation": "Detalle atomico 2",
+      "requestedValue": 49.0,
+      "vatValue": 6.39,
+      "billingConceptSequence": 1
+    }
+  ]
+}
+```
+
+### Response exitosa (200)
+
+```json
+{
+  "code": 200,
+  "message": "Creado",
+  "data": {
+    "replenishmentId": 39987,
+    "workAreaCode": 105,
+    "details": [
+      {
+        "detailId": 200,
+        "replenishmentId": 39987,
+        "documentType": "FAC",
+        "taxId": "1790016919001",
+        "documentNumber": "001-001-000012346",
+        "billingConceptSequence": 1,
+        "requestedValue": 50.0,
+        "vatValue": 6.52
+      },
+      {
+        "detailId": 201,
+        "replenishmentId": 39987,
+        "documentType": "FAC",
+        "taxId": "1790016919001",
+        "documentNumber": "001-001-000012347",
+        "billingConceptSequence": 1,
+        "requestedValue": 49.0,
+        "vatValue": 6.39
+      }
+    ]
+  }
+}
+```
+
+### Response validacion funcional (200)
+
+```json
+{
+  "code": 200,
+  "message": "No se pudo completar la creacion. Revise los errores reportados.",
+  "errors": [
+    "Fila 1: El detalle que se va a ingresar ya se encuentra ingresado, verifique por favor."
+  ]
+}
+```
+
+Notas:
+
+- Se reutiliza el endpoint principal de creacion (`POST /api/v1/replenishment-management`).
+- El endpoint ejecuta create de cabecera y create batch de detalle en una sola transaccion.
+- Si falla cualquier validacion de detalle, se revierte tambien la cabecera (sin cabeceras huerfanas).
+- El contrato de errores funcionales mantiene `code: 200` con `errors[]` para consistencia con el flujo de management.
+
+---
+
 ## Regla de actualizacion
 
 Por cada endpoint nuevo se debe agregar en este archivo:
