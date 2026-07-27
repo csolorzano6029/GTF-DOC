@@ -756,7 +756,7 @@ Aclaracion sobre totales en create de cabecera:
 ```json
 {
   "code": 200,
-  "message": "No existe una persona con el responsiblePersonDocument enviado."
+  "message": "No existe una persona con el numero de cedula enviado."
 }
 ```
 
@@ -1765,6 +1765,7 @@ Notas:
 - Metodo: POST
 - URL: /gtfReplacementsServices/api/v1/replenishment-management
 - URL completa sugerida: {{host}}/gtfReplacementsServices/api/v1/replenishment-management
+- Analisis tecnico detallado: ver `docs/apis/Backend-Reposiciones-POST-replenishment-management-Flujo-Detallado.md`
 
 ### Parametros
 
