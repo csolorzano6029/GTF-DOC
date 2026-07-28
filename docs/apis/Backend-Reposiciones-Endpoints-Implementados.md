@@ -1633,6 +1633,102 @@ Reglas de negocio aplicadas:
 
 ---
 
+## 11.1) Editar varias lineas de detalle
+
+### Resumen
+
+- Nombre: Editar varias lineas de detalle para una reposicion
+- Metodo: POST
+- URL: /gtfReplacementsServices/api/v1/replenishment-management/{replenishmentId}/details/update
+- URL completa sugerida: {{host}}/gtfReplacementsServices/api/v1/replenishment-management/{replenishmentId}/details/update
+
+### Parametros
+
+| Tipo | Nombre          | Requerido | Tipo dato | Descripcion                                                  |
+| ---- | --------------- | --------- | --------- | ------------------------------------------------------------ |
+| Path | replenishmentId | Si        | Long      | Identificador de la cabecera de reposicion                   |
+| Body | request         | Si        | Array     | Lista de detalles a actualizar (cada item requiere detailId) |
+
+### Request payload
+
+```json
+[
+  {
+    "detailId": 768013,
+    "documentType": "FAC",
+    "taxId": "1103264071001",
+    "documentNumber": "006-012-000149434",
+    "documentDate": 1782968392000,
+    "observation": "Compra de insumos - ajuste lote",
+    "requestedValue": 21.0,
+    "vatValue": 2.74,
+    "billingConceptSequence": 1,
+    "fileName": "factura-001-ajustada.pdf"
+  },
+  {
+    "detailId": 768014,
+    "documentType": "FAC",
+    "taxId": "1790016919001",
+    "documentNumber": "001-001-000012347",
+    "documentDate": 1782968392000,
+    "observation": "Actualizacion por lote",
+    "requestedValue": 19.5,
+    "vatValue": 2.54,
+    "billingConceptSequence": 1
+  }
+]
+```
+
+Notas:
+
+- `companyCode` se toma del token Keycloak.
+- Cada item debe incluir `detailId`; si falta en algun item, el lote se rechaza.
+- Si una fila falla en validacion funcional, el backend revierte el lote y no mantiene cambios parciales.
+- El endpoint reutiliza las mismas reglas de negocio de `POST /details/{detailId}` para cada fila.
+
+### Response exitosa (200)
+
+```json
+{
+  "code": 200,
+  "message": "OK",
+  "data": [
+    {
+      "detailId": 768013,
+      "replenishmentId": 39996,
+      "documentType": "FAC",
+      "taxId": "1103264071001",
+      "documentNumber": "006-012-000149434",
+      "billingConceptSequence": 1,
+      "requestedValue": 21.0,
+      "vatValue": 2.74
+    },
+    {
+      "detailId": 768014,
+      "replenishmentId": 39996,
+      "documentType": "FAC",
+      "taxId": "1790016919001",
+      "documentNumber": "001-001-000012347",
+      "billingConceptSequence": 1,
+      "requestedValue": 19.5,
+      "vatValue": 2.54
+    }
+  ]
+}
+```
+
+### Response validacion funcional (200)
+
+```json
+{
+  "code": 200,
+  "message": "No se pudo completar la actualizacion. Revise los errores reportados.",
+  "errors": ["Debe enviar al menos un detalle para actualizar."]
+}
+```
+
+---
+
 ## 12) Obtener valores de catalogo generico
 
 ### Resumen

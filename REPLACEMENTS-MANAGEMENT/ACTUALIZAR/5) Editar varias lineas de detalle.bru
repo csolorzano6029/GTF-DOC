@@ -1,0 +1,167 @@
+meta {
+  name: 5) Editar varias lineas de detalle
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{host}}/gtfReplacementsServices/api/v1/replenishment-management/39996/details/update
+  body: json
+  auth: inherit
+}
+
+body:json {
+  [
+    {
+      "detailId": 768013,
+      "documentType": "FAC",
+      "taxId": "1103264071001",
+      "documentNumber": "006-012-000149434",
+      "documentDate": 1782968392000,
+      "observation": "Compra de insumos - ajuste lote",
+      "requestedValue": 21.0,
+      "vatValue": 2.74,
+      "billingConceptSequence": 1,
+      "fileName": "factura-001-ajustada.pdf"
+    },
+    {
+      "detailId": 768014,
+      "documentType": "FAC",
+      "taxId": "1790016919001",
+      "documentNumber": "001-001-000012347",
+      "documentDate": 1782968392000,
+      "observation": "Actualizacion por lote",
+      "requestedValue": 19.5,
+      "vatValue": 2.54,
+      "billingConceptSequence": 1
+    }
+  ]
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  ## Objetivo
+  Actualizar varias lineas de detalle de una reposicion en una sola solicitud.
+  
+  ## Metodo y ruta
+  - Metodo: `POST`
+  - Ruta: `/api/v1/replenishment-management/{replenishmentId}/details/update`
+  
+  ## Pantalla Front
+  Administracion de Reposiciones -> Tabla detalle -> Edicion multiple.
+  
+  ## Cuando usarlo
+  - Al confirmar cambios de varias filas en un solo guardado.
+  
+  ## Parametros
+  - Path `replenishmentId` (obligatorio): cabecera a la que pertenecen las lineas.
+  - Body `List<ReplenishmentDetailVo>` (obligatorio): lista de filas a actualizar.
+  - Cada fila debe incluir `detailId`.
+  
+  ## Reglas funcionales clave
+  - Solo aplica cuando la cabecera esta en estado pendiente.
+  - Reutiliza reglas de validacion del endpoint unitario por cada fila.
+  - Si una fila falla, el lote se revierte y no quedan cambios parciales.
+  
+  ## Prioridad recomendada de lectura en Front
+  1. Revisar `message` para confirmar resultado general del lote.
+  2. Si `message=OK`, refrescar filas con `data`.
+  3. Si error, mostrar `errors[0]` y mantener lote para correccion.
+  
+  ## Mapeo de campos API -> pantalla Front
+  - `message` -> resultado global de la operacion batch.
+  - `data[].detailId` -> fila actualizada.
+  - `data[].documentType`, `taxId`, `documentNumber`, `documentDate` -> datos del comprobante.
+  - `data[].billingConceptSequence` -> concepto aplicado por fila.
+  - `data[].requestedValue`, `data[].vatValue` -> valores actualizados en tabla.
+}
+
+example {
+  name: Escenario exitoso
+  
+  request: {
+    url: {{host}}/gtfReplacementsServices/api/v1/replenishment-management/39996/details/update
+    method: POST
+    mode: json
+    body:json: {
+      [
+        {
+          "detailId": 768013,
+          "documentType": "FAC",
+          "taxId": "1103264071001",
+          "documentNumber": "006-012-000149434",
+          "documentDate": 1782968392000,
+          "requestedValue": 21.0,
+          "vatValue": 2.74,
+          "billingConceptSequence": 1
+        }
+      ]
+    }
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+        {
+          "code": 200,
+          "message": "OK",
+          "data": [
+            {
+              "detailId": 768013,
+              "replenishmentId": 39996,
+              "documentType": "FAC",
+              "taxId": "1103264071001",
+              "documentNumber": "006-012-000149434",
+              "billingConceptSequence": 1,
+              "requestedValue": 21.0,
+              "vatValue": 2.74
+            }
+          ]
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: Escenario con lote invalido
+  
+  request: {
+    url: {{host}}/gtfReplacementsServices/api/v1/replenishment-management/39996/details/update
+    method: POST
+    mode: json
+    body:json: {
+      []
+    }
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+        {
+          "code": 200,
+          "message": "No se pudo completar la actualizacion. Revise los errores reportados.",
+          "errors": [
+            "Debe enviar al menos un detalle para actualizar."
+          ]
+        }
+      '''
+    }
+  }
+}
