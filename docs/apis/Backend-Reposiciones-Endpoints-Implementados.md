@@ -1959,6 +1959,79 @@ Notas:
 
 ---
 
+## 15) Enviar reposicion
+
+### Resumen
+
+- Nombre: Enviar reposicion a contabilidad
+- Metodo: POST
+- URL: /gtfReplacementsServices/api/v1/replenishment-management/{replenishmentId}/send
+- URL completa sugerida: {{host}}/gtfReplacementsServices/api/v1/replenishment-management/{replenishmentId}/send
+
+### Parametros
+
+| Tipo | Nombre          | Requerido | Tipo dato | Descripcion                             |
+| ---- | --------------- | --------- | --------- | --------------------------------------- |
+| Path | replenishmentId | Si        | Long      | Identificador de la reposicion a enviar |
+
+### Request
+
+Sin body.
+
+```http
+POST /gtfReplacementsServices/api/v1/replenishment-management/40027/send
+```
+
+### Reglas funcionales clave
+
+- Solo se puede enviar una reposicion en estado pendiente.
+- Debe existir al menos una linea de detalle activa.
+- Para Caja Chica con pago por ventanilla (`VEN`), el envio requiere `checkResponsiblePersonId` valido.
+- En envio exitoso se ejecutan efectos transaccionales del flujo legacy:
+  - cambio de estado a enviado (`ENV`),
+  - registro de historial de estado,
+  - registro de movimiento financiero de egreso,
+  - actualizacion de fondo del area (`pendingPaymentAmount` y `cashBalance`).
+
+### Response exitosa (200)
+
+```json
+{
+  "code": 200,
+  "message": "OK",
+  "data": {
+    "replenishmentId": 40027,
+    "replenishmentStatus": "SENT",
+    "replenishmentStatusName": "Enviado"
+  }
+}
+```
+
+### Response validacion funcional (200)
+
+```json
+{
+  "code": 200,
+  "message": "Solo se puede enviar una reposicion en estado pendiente."
+}
+```
+
+```json
+{
+  "code": 200,
+  "message": "Debe existir al menos un detalle para enviar la reposicion."
+}
+```
+
+```json
+{
+  "code": 200,
+  "message": "La reposicion no puede ser enviada porque no se encontro a nombre de quien sale el cheque de la solicitud."
+}
+```
+
+---
+
 ## Regla de actualizacion
 
 Por cada endpoint nuevo se debe agregar en este archivo:

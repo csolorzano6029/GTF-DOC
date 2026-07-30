@@ -5,7 +5,7 @@ meta {
 }
 
 post {
-  url: {{host}}/gtfReplacementsServices/api/v1/replenishment-management/39996/details/update
+  url: {{host}}/gtfReplacementsServices/api/v1/replenishment-management/40027/details/update
   body: json
   auth: inherit
 }
@@ -13,27 +13,30 @@ post {
 body:json {
   [
     {
-      "detailId": 768013,
+      "billingConceptSequence": 39351,
+      "detailId": 768067,
+      "documentDate": 1785214800000,
+      "documentNumber": "001-001-000000016",
       "documentType": "FAC",
-      "taxId": "1103264071001",
-      "documentNumber": "006-012-000149434",
-      "documentDate": 1782968392000,
-      "observation": "Compra de insumos - ajuste lote",
-      "requestedValue": 21.0,
-      "vatValue": 2.74,
-      "billingConceptSequence": 1,
-      "fileName": "factura-001-ajustada.pdf"
+      "documentTypeName": "Factura",
+      "fileName": "",
+      "observation": "asdasdad",
+      "requestedValue": 10.0,
+      "taxId": "1313445262001",
+      "vatValue": 0.1
     },
     {
-      "detailId": 768014,
-      "documentType": "FAC",
-      "taxId": "1790016919001",
-      "documentNumber": "001-001-000012347",
-      "documentDate": 1782968392000,
-      "observation": "Actualizacion por lote",
-      "requestedValue": 19.5,
-      "vatValue": 2.54,
-      "billingConceptSequence": 1
+      "billingConceptSequence": 39380,
+      "detailId": 768068,
+      "documentDate": 1785214800000,
+      "documentNumber": "001-001-000000017",
+      "documentType": "FEL",
+      "documentTypeName": "Factura electrónica",
+      "fileName": "",
+      "observation": "rwerwerw",
+      "requestedValue": 15.0,
+      "taxId": "1313445262001",
+      "vatValue": 0.0
     }
   ]
 }
