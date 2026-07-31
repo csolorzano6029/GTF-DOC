@@ -21,7 +21,7 @@ Este archivo se actualiza cada vez que se crea o modifica un endpoint.
 
 - Modulo: replenishments + catalogs (generico)
 - Base URL aplicacion: /gtfReplacementsServices
-- Base path controllers: /api/v1/replenishments (compartido), /api/v1/replenishment-management (administracion), /api/v1/replenishment-reviews (revision) y /api/v1/catalogs
+- Base path controllers: /api/v1/replenishments (compartido), /api/v1/replenishment-management (administracion), /api/v1/replenishment-reviews (revision), /api/v1/catalogs y /api/v1/google-cloud-storage
 
 ## Convenciones de respuesta
 
@@ -2029,6 +2029,146 @@ POST /gtfReplacementsServices/api/v1/replenishment-management/40027/send
   "message": "La reposicion no puede ser enviada porque no se encontro a nombre de quien sale el cheque de la solicitud."
 }
 ```
+
+---
+
+## 16) Subir archivo a Google Cloud Storage
+
+### Resumen
+
+- Nombre: Subir archivo y obtener URL firmada
+- Metodo: POST
+- URL: /gtfReplacementsServices/api/v1/google-cloud-storage/upload-file
+- URL completa sugerida: {{host}}/gtfReplacementsServices/api/v1/google-cloud-storage/upload-file
+
+### Parametros
+
+| Tipo      | Nombre | Requerido | Tipo dato | Descripcion                            |
+| --------- | ------ | --------- | --------- | -------------------------------------- |
+| Form-data | file   | Si        | File      | Archivo a subir al bucket configurado. |
+
+### Ejemplo de request
+
+```http
+POST /gtfReplacementsServices/api/v1/google-cloud-storage/upload-file
+Content-Type: multipart/form-data
+```
+
+### Ejemplo de response con data (200)
+
+```json
+{
+  "code": 200,
+  "message": "OK",
+  "data": "https://storage.googleapis.com/cf-max-dev/factura-001.pdf?..."
+}
+```
+
+### Ejemplo de response sin data (200)
+
+```json
+{
+  "code": 200,
+  "message": "OK"
+}
+```
+
+Notas:
+
+- La URL en `data` es firmada y temporal.
+- La clave privada de la cuenta de servicio se inyecta desde `${PRIVATE_KEY_GCS}`.
+
+---
+
+## 17) Buscar archivo en Google Cloud Storage
+
+### Resumen
+
+- Nombre: Buscar archivo y obtener URL firmada
+- Metodo: GET
+- URL: /gtfReplacementsServices/api/v1/google-cloud-storage/search-file
+- URL completa sugerida: {{host}}/gtfReplacementsServices/api/v1/google-cloud-storage/search-file?blobName=factura-001.pdf
+
+### Parametros
+
+| Tipo  | Nombre   | Requerido | Tipo dato | Descripcion                                     |
+| ----- | -------- | --------- | --------- | ----------------------------------------------- |
+| Query | blobName | Si        | String    | Nombre del archivo en el bucket, con extension. |
+
+### Ejemplo de request
+
+```http
+GET /gtfReplacementsServices/api/v1/google-cloud-storage/search-file?blobName=factura-001.pdf
+```
+
+### Ejemplo de response con data (200)
+
+```json
+{
+  "code": 200,
+  "message": "OK",
+  "data": "https://storage.googleapis.com/cf-max-dev/factura-001.pdf?..."
+}
+```
+
+### Ejemplo de response sin data (200)
+
+```json
+{
+  "code": 200,
+  "message": "OK"
+}
+```
+
+Notas:
+
+- Si el blob no existe, la API responde `200` con `message: OK` y omite `data`.
+
+---
+
+## 18) Eliminar archivo en Google Cloud Storage
+
+### Resumen
+
+- Nombre: Eliminar archivo por nombre
+- Metodo: GET
+- URL: /gtfReplacementsServices/api/v1/google-cloud-storage/delete-file
+- URL completa sugerida: {{host}}/gtfReplacementsServices/api/v1/google-cloud-storage/delete-file?blobName=factura-001.pdf
+
+### Parametros
+
+| Tipo  | Nombre   | Requerido | Tipo dato | Descripcion                                     |
+| ----- | -------- | --------- | --------- | ----------------------------------------------- |
+| Query | blobName | Si        | String    | Nombre del archivo en el bucket, con extension. |
+
+### Ejemplo de request
+
+```http
+GET /gtfReplacementsServices/api/v1/google-cloud-storage/delete-file?blobName=factura-001.pdf
+```
+
+### Ejemplo de response (200)
+
+```json
+{
+  "code": 200,
+  "message": "OK",
+  "data": true
+}
+```
+
+```json
+{
+  "code": 200,
+  "message": "OK",
+  "data": false
+}
+```
+
+Notas:
+
+- `true`: el archivo fue eliminado.
+- `false`: no existia o no fue posible eliminarlo.
 
 ---
 

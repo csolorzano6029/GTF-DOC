@@ -5,7 +5,8 @@ meta {
 }
 
 post {
-  url: {{host}}/gtfReplacementsServices/api/v1/replenishment-management/40027/send
+  url: {{host}}/gtfReplacementsServices/api/v1/replenishment-management/40033/send
+  body: none
   auth: inherit
 }
 
@@ -17,21 +18,21 @@ settings {
 docs {
   ## Objetivo
   Enviar una reposicion pendiente a contabilidad.
-
+  
   ## Metodo y ruta
   - Metodo: `POST`
   - Ruta: `/api/v1/replenishment-management/{replenishmentId}/send`
-
+  
   ## Pantalla Front
   Administracion de Reposiciones -> accion Enviar.
-
+  
   ## Cuando usarlo
   - Al confirmar envio de una reposicion que ya tiene detalle cargado.
-
+  
   ## Parametros
   - Path `replenishmentId` (obligatorio): id de la reposicion a enviar.
   - Body: no aplica.
-
+  
   ## Reglas funcionales clave
   - Solo se puede enviar una reposicion en estado pendiente.
   - Debe existir al menos una linea de detalle activa.
@@ -40,12 +41,12 @@ docs {
     - registro de historial de estado,
     - registro de movimiento de egreso,
     - actualizacion de `pendingPaymentAmount` y `cashBalance` del fondo del area.
-
+  
   ## Prioridad recomendada de lectura en Front
   1. Revisar `message` para feedback inmediato de validacion o exito.
   2. Si `message=OK`, refrescar cabecera y detalle.
   3. Reconsultar `current-fund` para ver saldos actualizados.
-
+  
   ## Mapeo de campos API -> pantalla Front
   - `message` -> resultado de la accion de envio.
   - `data.replenishmentStatus` + `data.replenishmentStatusName` -> estado visual de la cabecera.
@@ -54,18 +55,19 @@ docs {
 
 example {
   name: Escenario exitoso
-
+  
   request: {
     url: {{host}}/gtfReplacementsServices/api/v1/replenishment-management/40027/send
     method: POST
+    mode: none
   }
-
+  
   response: {
     status: {
       code: 200
       text: OK
     }
-
+  
     body: {
       type: text
       content: '''
@@ -85,18 +87,19 @@ example {
 
 example {
   name: Escenario con validacion funcional
-
+  
   request: {
     url: {{host}}/gtfReplacementsServices/api/v1/replenishment-management/40027/send
     method: POST
+    mode: none
   }
-
+  
   response: {
     status: {
       code: 200
       text: OK
     }
-
+  
     body: {
       type: text
       content: '''

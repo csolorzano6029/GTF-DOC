@@ -1,0 +1,36 @@
+meta {
+  name: 1) Subir archivo a GCS
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{host}}/gtfReplacementsServices/api/v1/google-cloud-storage/upload-file
+  body: multipart-form
+  auth: inherit
+}
+
+body:multipart-form {
+  file: @file(/path/to/file.pdf)
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  ## Objetivo
+  Subir un archivo al bucket configurado en Google Cloud Storage y obtener una URL firmada temporal.
+  
+  ## Metodo y ruta
+  - Metodo: `POST`
+  - Ruta: `/api/v1/google-cloud-storage/upload-file`
+  
+  ## Parametros
+  - Form-data: `file` (archivo a cargar)
+  
+  ## Respuesta esperada
+  - `message`: `OK`
+  - `data`: URL firmada del archivo (si la carga fue exitosa)
+}

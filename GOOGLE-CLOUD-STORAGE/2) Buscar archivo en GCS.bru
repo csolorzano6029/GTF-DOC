@@ -1,0 +1,32 @@
+meta {
+  name: 2) Buscar archivo en GCS
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{host}}/gtfReplacementsServices/api/v1/google-cloud-storage/search-file?blobName=invoice.pdf
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  ## Objetivo
+  Buscar un archivo existente en Google Cloud Storage por nombre y devolver una URL firmada.
+  
+  ## Metodo y ruta
+  - Metodo: `GET`
+  - Ruta: `/api/v1/google-cloud-storage/search-file`
+  
+  ## Parametros
+  - Query: `blobName` (nombre del archivo incluyendo extension)
+  
+  ## Respuesta esperada
+  - `message`: `OK`
+  - `data`: URL firmada cuando el blob existe.
+}

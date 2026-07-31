@@ -1,0 +1,32 @@
+meta {
+  name: 3) Eliminar archivo en GCS
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{host}}/gtfReplacementsServices/api/v1/google-cloud-storage/delete-file?blobName=invoice.pdf
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  ## Objetivo
+  Eliminar un archivo en Google Cloud Storage por nombre.
+  
+  ## Metodo y ruta
+  - Metodo: `GET`
+  - Ruta: `/api/v1/google-cloud-storage/delete-file`
+  
+  ## Parametros
+  - Query: `blobName` (nombre del archivo incluyendo extension)
+  
+  ## Respuesta esperada
+  - `message`: `OK`
+  - `data`: `true` si el blob fue eliminado, `false` si no existia o no se pudo eliminar.
+}
