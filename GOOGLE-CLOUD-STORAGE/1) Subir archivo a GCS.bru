@@ -6,12 +6,12 @@ meta {
 
 post {
   url: {{host}}/gtfReplacementsServices/api/v1/google-cloud-storage/upload-file
-  body: multipart-form
+  body: multipartForm
   auth: inherit
 }
 
 body:multipart-form {
-  file: @file(/path/to/file.pdf)
+  file: @file(C:\Users\csolo\Downloads\imagen_2026-07-31_103531312.png) @contentType(image/png)
 }
 
 settings {
