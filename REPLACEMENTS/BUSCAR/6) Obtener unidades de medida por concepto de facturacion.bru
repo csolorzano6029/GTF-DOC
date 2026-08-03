@@ -1,0 +1,49 @@
+meta {
+  name: 6) Obtener unidades de medida por concepto de facturacion
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{host}}/gtfReplacementsServices/api/v1/replenishments/billing-concepts/39403/measurement-units
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  ## Objetivo
+  Obtener unidades de medida permitidas para un concepto de facturacion de reposiciones.
+  
+  ## Metodo y ruta
+  - Metodo: `GET`
+  - Ruta: `/api/v1/replenishments/billing-concepts/{billingConceptSequence}/measurement-units`
+  
+  ## Pantalla Front
+  Administracion de Reposiciones -> Detalle -> Selector de unidad de medida.
+  
+  ## Cuando usarlo
+  - Despues de seleccionar un concepto de facturacion.
+  - Solo aplica cuando el concepto requiere huella de carbono.
+  
+  ## Parametros
+  - Path `billingConceptSequence` (obligatorio): secuencial del concepto seleccionado.
+  
+  ## Reglas funcionales clave
+  - Si el concepto no requiere huella de carbono, retorna arreglo vacio.
+  - Si el concepto no tiene unidades configuradas, retorna arreglo vacio.
+  - `companyCode` se toma del contexto de seguridad (token), no por query.
+  
+  ## Respuesta esperada
+  Arreglo de valores de catalogo (`CatalogValueVo`) con las unidades permitidas.
+  
+  ## Mapeo de campos API -> pantalla Front
+  - `catalogTypeCode` -> tipo de catalogo de unidad de medida.
+  - `catalogValueCode` -> codigo tecnico de unidad para guardar en detalle.
+  - `catalogValueName` -> etiqueta visible en el combo de unidad.
+  - `shortName` -> etiqueta corta opcional para UI.
+}

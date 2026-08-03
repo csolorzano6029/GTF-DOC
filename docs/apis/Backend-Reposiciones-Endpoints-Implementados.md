@@ -1149,6 +1149,62 @@ Notas:
 
 ---
 
+## 8.1.1) Obtener unidades de medida por concepto de facturacion
+
+### Resumen
+
+- Nombre: Obtener unidades de medida habilitadas para un concepto de facturacion
+- Metodo: GET
+- URL: /gtfReplacementsServices/api/v1/replenishments/billing-concepts/{billingConceptSequence}/measurement-units
+- URL completa sugerida: {{host}}/gtfReplacementsServices/api/v1/replenishments/billing-concepts/{billingConceptSequence}/measurement-units
+
+### Parametros
+
+| Tipo | Nombre                 | Requerido | Tipo dato | Descripcion                                                   |
+| ---- | ---------------------- | --------- | --------- | ------------------------------------------------------------- |
+| Path | billingConceptSequence | Si        | Integer   | Secuencial del concepto seleccionado en detalle de reposicion |
+
+### Reglas funcionales
+
+- El backend solo retorna datos cuando el concepto requiere huella de carbono.
+- Si el concepto no requiere huella de carbono, responde `200` con `data: []`.
+- Si el concepto no tiene unidades configuradas, responde `200` con `data: []`.
+- `companyCode` se toma del token de Keycloak.
+
+### Ejemplo de request
+
+```http
+GET /gtfReplacementsServices/api/v1/replenishments/billing-concepts/101/measurement-units
+```
+
+### Ejemplo de response (200)
+
+```json
+{
+  "code": 200,
+  "message": "OK",
+  "data": [
+    {
+      "catalogTypeCode": 911,
+      "catalogValueCode": "UND",
+      "catalogValueName": "Unidad",
+      "shortName": "UND",
+      "state": "1",
+      "numericValue": 1
+    }
+  ]
+}
+```
+
+### Mapeo de campos para Front
+
+- `catalogTypeCode`: tipo de catalogo de unidad de medida.
+- `catalogValueCode`: codigo tecnico para persistir en detalle (`measurementValueCode`).
+- `catalogValueName`: etiqueta visual para el combo de unidad.
+- `shortName`: etiqueta corta opcional para UI.
+
+---
+
 ## 8.2) Prevalidar fila de detalle con cabecera persistida
 
 ### Resumen
