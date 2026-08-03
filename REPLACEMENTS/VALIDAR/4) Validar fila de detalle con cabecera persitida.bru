@@ -1,11 +1,11 @@
 meta {
-  name: 3) Validar fila de detalle sin cabecera persistida
+  name: 4) Validar fila de detalle con cabecera persitida
   type: http
-  seq: 3
+  seq: 4
 }
 
 post {
-  url: {{host}}/gtfReplacementsServices/api/v1/replenishments/1321313/details/validate-add
+  url: {{host}}/gtfReplacementsServices/api/v1/replenishments/details/validate-add
   body: json
   auth: inherit
 }
