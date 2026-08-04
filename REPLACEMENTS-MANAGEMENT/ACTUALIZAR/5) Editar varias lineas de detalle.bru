@@ -5,7 +5,7 @@ meta {
 }
 
 post {
-  url: {{host}}/gtfReplacementsServices/api/v1/replenishment-management/40027/details/update
+  url: {{host}}/gtfReplacementsServices/api/v1/replenishment-management/40039/details/update
   body: json
   auth: inherit
 }
@@ -13,31 +13,27 @@ post {
 body:json {
   [
     {
-      "billingConceptSequence": 39351,
-      "detailId": 768067,
-      "documentDate": 1785214800000,
-      "documentNumber": "001-001-000000016",
-      "documentType": "FAC",
-      "documentTypeName": "Factura",
-      "fileName": "",
-      "observation": "asdasdad",
-      "requestedValue": 10.0,
-      "taxId": "1313445262001",
-      "vatValue": 0.1
+      "billingConceptSequence": 57098,
+      "detailId": 768031,
+      "documentDate": 1785715200000,
+      "documentNumber": null,
+      "documentType": "REN",
+      "documentTypeName": "Recibo manual",
+      "observation": "TEST",
+      "requestedValue": 12.0,
+      "taxId": null,
+      "vatValue": 0.0
     },
     {
-      "billingConceptSequence": 39380,
-      "detailId": 768068,
-      "documentDate": 1785214800000,
-      "documentNumber": "001-001-000000017",
-      "documentType": "FEL",
-      "documentTypeName": "Factura electrónica",
-      "fileName": "",
-      "observation": "rwerwerw",
-      "requestedValue": 15.0,
-      "taxId": "1313445262001",
-      "vatValue": 0.0
-    }
+        "billingConceptSequence": 57109,
+        "detailId": 768032,
+        "documentDate": 1785715200000,
+        "documentType": "REN",
+        "documentTypeName": "Recibo manual",
+        "observation": "TEST2",
+        "requestedValue": 15.0,
+        "vatValue": 0.0
+      }
   ]
 }
 

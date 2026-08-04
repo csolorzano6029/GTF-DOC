@@ -1,0 +1,191 @@
+meta {
+  name: 2) Validar pre-check para actualizar varias lineas
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{host}}/gtfReplacementsServices/api/v1/replenishment-management/40039/details/validate-update
+  body: json
+  auth: inherit
+}
+
+body:json {
+  [
+      {
+        "billingConceptSequence": 39360,
+        "detailId": 768031,
+        "documentDate": 1785715200000,
+        "documentNumber": "001-001-000100021",
+        "documentType": "FAC",
+        "documentTypeName": "Factura",
+        "observation": "TEST",
+        "requestedValue": 12.0,
+        "taxId": "1312706029001",
+        "vatValue": 0.0,
+        "fileName":"doc.pdf"
+      },
+      {
+        "billingConceptSequence": 57098,
+        "detailId": 768031,
+        "documentDate": 1785715200000,
+        "documentNumber": "001-001-000100020",
+        "documentType": "REN",
+        "documentTypeName": "Factura",
+        "observation": "FAC",
+        "requestedValue": 12.0,
+        "taxId": "1312706029001",
+        "vatValue": 0.0
+      }
+    ]
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  ## Objetivo
+  Validar todas las filas editadas antes de enviar el update masivo, sin persistir cambios.
+  
+  ## Metodo y ruta
+  - Metodo: `POST`
+  - Ruta: `/api/v1/replenishment-management/{replenishmentId}/details/validate-update`
+  
+  ## Pantalla Front
+  Administracion de Reposiciones -> Tabla detalle -> Pre-check antes de Guardar cambios masivos.
+  
+  ## Cuando usarlo
+  - Cuando el usuario modifica varias filas y desea validar el lote antes del update definitivo.
+  - Antes de invocar `/details/update` para evitar errores de negocio en el guardado.
+  
+  ## Parametros
+  - Path `replenishmentId` (obligatorio).
+  - Body `List<ReplenishmentDetailVo>` (obligatorio).
+  - Cada fila debe incluir `detailId`.
+  
+  ## Reglas funcionales clave
+  - No persiste cambios.
+  - Reutiliza reglas de negocio de actualizacion de detalle.
+  - Si una fila tiene error funcional, se reporta en `errors` con prefijo por indice (`Fila N:`).
+  - Si faltan campos obligatorios de request, retorna `400 Bad Request`.
+  
+  ## Prioridad recomendada de lectura en Front
+  1. Revisar `message`.
+  2. Si `message=OK`, habilitar envio de update batch.
+  3. Si hay error, mostrar `errors[]` y resaltar las filas con problema.
+  
+  ## Respuesta esperada
+  Resultado de validacion del lote completo para update.
+  
+  ## Mapeo de campos API -> pantalla Front
+  - `message` -> estado global del pre-check.
+  - `errors[]` -> errores funcionales por fila para correccion en tabla.
+  - `data[].detailId` -> fila validada.
+  - `data[].requestedValue`, `data[].vatValue` -> valores listos para update.
+  - `data[].billingConceptSequence` -> concepto validado por fila.
+}
+
+example {
+  name: Escenario exitoso
+  
+  request: {
+    url: {{host}}/gtfReplacementsServices/api/v1/replenishment-management/39996/details/validate-update
+    method: POST
+    mode: json
+    body:json: {
+      [
+        {
+          "detailId": 768013,
+          "documentType": "FAC",
+          "taxId": "1103264071001",
+          "documentNumber": "006-012-000149434",
+          "documentDate": 1782968392000,
+          "observation": "precheck ok",
+          "requestedValue": 21.0,
+          "vatValue": 2.74,
+          "billingConceptSequence": 1,
+          "fileName": "factura-001-ajustada.pdf",
+          "fileType": "pdf"
+        }
+      ]
+    }
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+        {
+          "code": 200,
+          "message": "OK",
+          "data": [
+            {
+              "detailId": 768013,
+              "replenishmentId": 39996,
+              "documentType": "FAC",
+              "taxId": "1103264071001",
+              "documentNumber": "006-012-000149434",
+              "billingConceptSequence": 1,
+              "requestedValue": 21.0,
+              "vatValue": 2.74,
+              "fileName": "factura-001-ajustada.pdf",
+              "fileType": "pdf"
+            }
+          ]
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: Escenario con errores funcionales por fila
+  
+  request: {
+    url: {{host}}/gtfReplacementsServices/api/v1/replenishment-management/39996/details/validate-update
+    method: POST
+    mode: json
+    body:json: {
+      [
+        {
+          "detailId": null,
+          "documentType": "FAC",
+          "taxId": "1103264071001",
+          "documentNumber": "006-012-000149434",
+          "documentDate": 1782968392000,
+          "observation": "precheck con error",
+          "requestedValue": 21.0,
+          "vatValue": 2.74,
+          "billingConceptSequence": 1
+        }
+      ]
+    }
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+        {
+          "code": 200,
+          "message": "La validacion de actualizacion de detalles presenta errores.",
+          "errors": [
+            "Fila 1: Todos los detailId enviados son obligatorios para actualizar."
+          ]
+        }
+      '''
+    }
+  }
+}

@@ -1785,6 +1785,115 @@ Notas:
 
 ---
 
+## 11.2) Validar varias lineas de detalle antes de actualizar
+
+### Resumen
+
+- Nombre: Validar pre-check de actualizacion masiva de detalle
+- Metodo: POST
+- URL: /gtfReplacementsServices/api/v1/replenishment-management/{replenishmentId}/details/validate-update
+- URL completa sugerida: {{host}}/gtfReplacementsServices/api/v1/replenishment-management/{replenishmentId}/details/validate-update
+
+### Parametros
+
+| Tipo | Nombre          | Requerido | Tipo dato | Descripcion                                                             |
+| ---- | --------------- | --------- | --------- | ----------------------------------------------------------------------- |
+| Path | replenishmentId | Si        | Long      | Identificador de la cabecera de reposicion                              |
+| Body | request         | Si        | Array     | Lista de detalles a validar para update (cada item requiere `detailId`) |
+
+### Request payload
+
+```json
+[
+  {
+    "detailId": 768013,
+    "documentType": "FAC",
+    "taxId": "1103264071001",
+    "documentNumber": "006-012-000149434",
+    "documentDate": 1782968392000,
+    "observation": "Pre-check de actualizacion",
+    "requestedValue": 21.0,
+    "vatValue": 2.74,
+    "billingConceptSequence": 1,
+    "fileName": "factura-001-ajustada.pdf",
+    "fileType": "pdf"
+  },
+  {
+    "detailId": 768014,
+    "documentType": "FEL",
+    "taxId": "1790016919001",
+    "documentNumber": "001-001-000012347",
+    "documentDate": 1782968392000,
+    "observation": "Pre-check fila 2",
+    "requestedValue": 19.5,
+    "vatValue": 2.54,
+    "billingConceptSequence": 1
+  }
+]
+```
+
+Notas:
+
+- Este endpoint no persiste cambios; solo ejecuta validaciones de negocio previas al update batch.
+- Reutiliza reglas de update existentes: cabecera pendiente, detalle existente, documento no duplicado y validaciones de negocio de detalle.
+- Tambien aplica validaciones de request (obligatorios) antes de entrar a negocio, pero mantiene contrato funcional `200` con `errors[]`.
+- Si una o mas filas no pasan validacion, la respuesta llega con `message` generico y `errors[]` por fila indexada (`Fila 1: ...`).
+
+### Response exitosa (200)
+
+```json
+{
+  "code": 200,
+  "message": "OK",
+  "errors": [],
+  "data": {
+    "sendAlert": false,
+    "blockedByAvailableBalance": false,
+    "blockedByUsagePercentage": false,
+    "valid": true
+  }
+}
+```
+
+### Response validacion funcional (200)
+
+```json
+{
+  "code": 200,
+  "message": "La validacion de actualizacion de detalles presenta errores.",
+  "errors": [
+    "Fila 1: Todos los detailId enviados son obligatorios para actualizar.",
+    "Fila 2: No existe el detalle solicitado."
+  ],
+  "data": {
+    "sendAlert": false,
+    "blockedByAvailableBalance": false,
+    "blockedByUsagePercentage": false,
+    "valid": false
+  }
+}
+```
+
+### Response validacion de request (200)
+
+```json
+{
+  "code": 200,
+  "message": "La validacion de actualizacion de detalles presenta errores.",
+  "errors": [
+    "Fila 1: El campo observation es obligatorio para actualizar el detalle."
+  ],
+  "data": {
+    "sendAlert": false,
+    "blockedByAvailableBalance": false,
+    "blockedByUsagePercentage": false,
+    "valid": false
+  }
+}
+```
+
+---
+
 ## 12) Obtener valores de catalogo generico
 
 ### Resumen
