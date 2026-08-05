@@ -1,0 +1,62 @@
+meta {
+  name: 3) Listar reposiciones cheque emitido (popup Nuevo)
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{host}}/gtfReplacementsServices/api/v1/replenishment-management/issued-check
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  ## Objetivo
+  Obtener el listado de reposiciones en estado cheque emitido del local autenticado para el popup previo al flujo Nuevo.
+
+  ## Metodo y ruta
+  - Metodo: `GET`
+  - Ruta: `/api/v1/replenishment-management/issued-check`
+
+  ## Pantalla Front
+  Administracion de Reposiciones -> Boton Nuevo -> Popup de reposiciones con cheque emitido.
+
+  ## Cuando usarlo
+  - Antes de abrir la cabecera de una nueva reposicion.
+  - Cuando `validate-new` reporta `issuedCheckReplenishment = true`.
+
+  ## Parametros
+  - No recibe query ni body.
+  - `companyCode` y `workAreaCode` se resuelven por token.
+
+  ## Reglas funcionales clave
+  - Solo retorna filas activas (`requestState = 1`).
+  - Incluye estados `CHE` y `ISSUED` del local actual.
+  - `replenishmentStatusName` se normaliza a `Pago emitido`.
+  - `replenishmentDate` prioriza `lastModifiedDate`; si no existe, usa `createdDate`.
+  - Cada cabecera incluye `issuedCheckDocuments` con filas desglosadas del popup legacy.
+  - En `issuedCheckDocuments`, el estado visible se mapea asi: `CHE/ISSUED -> Pago emitido`, `PAG/PAID -> Pagado`, otros -> `Pago pendiente`.
+  - `issuedCheckDocuments[].selectable` es `true` solo en filas `CHE/ISSUED`.
+
+  ## Respuesta esperada
+  Arreglo con cabeceras de reposicion cheque emitido y su desglose por documentos.
+
+  ## Mapeo de campos API -> pantalla Front
+  - `data[].replenishmentId` -> Numero de reposicion.
+  - `data[].replenishmentDate` -> Fecha de reposicion mostrada en popup.
+  - `data[].replenishmentStatus` -> Codigo tecnico de estado.
+  - `data[].replenishmentStatusName` -> Estado visible (`Pago emitido`).
+  - `data[].requestedTotal` -> Total de la reposicion.
+  - `data[].issuedCheckDocuments[]` -> Subfilas desglosadas por solicitud/documento.
+  - `data[].issuedCheckDocuments[].replenishmentStatusName` -> Estado visible por subfila.
+  - `data[].issuedCheckDocuments[].requestedTotal` -> Valor de cada subfila.
+  - `data[].issuedCheckDocuments[].selectable` -> Define si el Front debe habilitar checkbox.
+
+  ## Hint rapido de busqueda
+  Buscar por `issued-check` en la coleccion REPLACEMENTS-MANAGEMENT/VALIDAR.
+}

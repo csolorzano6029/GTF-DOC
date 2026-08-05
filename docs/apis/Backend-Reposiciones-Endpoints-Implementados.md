@@ -1435,6 +1435,125 @@ Ejemplo:
 
 ---
 
+## 8.4) Listar reposiciones con cheque emitido para popup de Nuevo
+
+### Resumen
+
+- Nombre: Listar reposiciones CHE activas del local antes de crear una nueva reposicion
+- Metodo: GET
+- URL: /gtfReplacementsServices/api/v1/replenishment-management/issued-check
+- URL completa sugerida: {{host}}/gtfReplacementsServices/api/v1/replenishment-management/issued-check
+
+### Parametros
+
+No recibe parametros de entrada.
+
+Notas:
+
+- `companyCode` y `workAreaCode` se resuelven desde el usuario autenticado (Keycloak).
+- Solo devuelve reposiciones activas (`requestState = 1`) en estado de cheque emitido (`CHE`/`ISSUED`) del local actual.
+- El backend normaliza `replenishmentDate` priorizando `lastModifiedDate` y, si no existe, `createdDate`.
+- Para paridad de lectura de popup legacy, `replenishmentStatusName` se devuelve como `Pago emitido` cuando el estado es `CHE` o `ISSUED`.
+- Cada cabecera incluye `issuedCheckDocuments` con el desglose de documentos/solicitudes del popup legacy.
+- En `issuedCheckDocuments`, el estado visible se mapea asi: `CHE/ISSUED -> Pago emitido`, `PAG/PAID -> Pagado`, otros -> `Pago pendiente`.
+- `issuedCheckDocuments[].selectable` solo es `true` para filas en estado `CHE/ISSUED`.
+
+### Ejemplo de request
+
+```http
+GET /gtfReplacementsServices/api/v1/replenishment-management/issued-check
+```
+
+### Ejemplo de response con filas (200)
+
+```json
+{
+  "code": 200,
+  "message": "OK",
+  "data": [
+    {
+      "replenishmentId": 40032,
+      "workAreaCode": 186,
+      "replenishmentStatus": "CHE",
+      "replenishmentStatusName": "Pago emitido",
+      "requestedTotal": 1.0,
+      "replenishmentDate": 1785347433109,
+      "issuedCheckDocuments": [
+        {
+          "issuedCheckDocumentId": 90001,
+          "sourceDocumentId": 7001,
+          "replenishmentId": 40032,
+          "workAreaCode": 186,
+          "replenishmentStatus": "CHE",
+          "replenishmentStatusName": "Pago emitido",
+          "requestedTotal": 1.0,
+          "replenishmentDate": 1785347433109,
+          "selectable": true,
+          "selected": false
+        }
+      ]
+    },
+    {
+      "replenishmentId": 37879,
+      "workAreaCode": 186,
+      "replenishmentStatus": "CHE",
+      "replenishmentStatusName": "Pago emitido",
+      "requestedTotal": 76.01,
+      "replenishmentDate": 1769614165853,
+      "issuedCheckDocuments": [
+        {
+          "issuedCheckDocumentId": 90011,
+          "sourceDocumentId": 7011,
+          "replenishmentId": 37879,
+          "workAreaCode": 186,
+          "replenishmentStatus": "CHE",
+          "replenishmentStatusName": "Pago emitido",
+          "requestedTotal": 59.81,
+          "replenishmentDate": 1766172080001,
+          "selectable": true,
+          "selected": false
+        },
+        {
+          "issuedCheckDocumentId": 90012,
+          "sourceDocumentId": 7012,
+          "replenishmentId": 37879,
+          "workAreaCode": 186,
+          "replenishmentStatus": "PAG",
+          "replenishmentStatusName": "Pagado",
+          "requestedTotal": 16.2,
+          "replenishmentDate": 1766172080001,
+          "selectable": false,
+          "selected": false
+        }
+      ]
+    }
+  ]
+}
+```
+
+### Mapeo de campos API -> pantalla Front
+
+- `data[].replenishmentId` -> Numero de reposicion (fila cabecera).
+- `data[].replenishmentDate` -> Fecha de reposicion (fila cabecera).
+- `data[].replenishmentStatusName` -> Estado visible cabecera (`Pago emitido`).
+- `data[].requestedTotal` -> Total de la cabecera.
+- `data[].issuedCheckDocuments[]` -> Filas desglosadas del popup.
+- `data[].issuedCheckDocuments[].replenishmentStatusName` -> Estado visible por fila (`Pago emitido`, `Pagado`, `Pago pendiente`).
+- `data[].issuedCheckDocuments[].requestedTotal` -> Total por fila desglosada.
+- `data[].issuedCheckDocuments[].selectable` -> Habilita checkbox solo para CHE/ISSUED.
+
+### Ejemplo de response sin filas (200)
+
+```json
+{
+  "code": 200,
+  "message": "OK",
+  "data": []
+}
+```
+
+---
+
 ## 9) Crear detalle (ruta consolidada)
 
 ### Nota de contrato
