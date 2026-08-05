@@ -2197,7 +2197,71 @@ POST /gtfReplacementsServices/api/v1/replenishment-management/40027/send
 
 ---
 
-## 16) Subir archivo a Google Cloud Storage
+## 16) Imprimir reposicion enviada (PDF)
+
+### Resumen
+
+- Nombre: Imprimir comprobante de reposicion enviada
+- Metodo: GET
+- URL: /gtfReplacementsServices/api/v1/replenishment-management/{replenishmentId}/print
+- URL completa sugerida: {{host}}/gtfReplacementsServices/api/v1/replenishment-management/{replenishmentId}/print
+
+### Parametros
+
+| Tipo | Nombre          | Requerido | Tipo dato | Descripcion                                                                         |
+| ---- | --------------- | --------- | --------- | ----------------------------------------------------------------------------------- |
+| Path | replenishmentId | Si        | Long      | Identificador de la reposicion a imprimir (debe estar en ENV/SENT y ser Caja Chica) |
+
+### Request
+
+Sin body.
+
+```http
+GET /gtfReplacementsServices/api/v1/replenishment-management/40027/print
+```
+
+### Reglas funcionales clave
+
+- Solo se puede imprimir una reposicion en estado enviado (`ENV` / `SENT`).
+- Solo se soporta impresion de reposiciones de Caja Chica (`transactionCode = 1`).
+- Si la reposicion no existe, responde validacion funcional.
+- En exito, la API devuelve un PDF generado por backend con estructura orientada al formato legacy de Caja Chica (cabecera, fondo, detalle, total y firmas).
+
+### Response exitosa (200)
+
+- Content-Type: `application/pdf`
+- Header: `Content-Disposition: inline; filename="replenishment-{replenishmentId}.pdf"`
+- Body: bytes binarios del PDF.
+
+### Response validacion funcional (HTTP 400)
+
+- Content-Type: `application/json`
+- Nota: el envelope mantiene `code: 200` y el mensaje funcional describe la causa.
+
+```json
+{
+  "code": 200,
+  "message": "Solo se puede imprimir una reposicion en estado enviado."
+}
+```
+
+```json
+{
+  "code": 200,
+  "message": "Solo se puede imprimir reposiciones de Caja Chica."
+}
+```
+
+```json
+{
+  "code": 200,
+  "message": "No existe la reposicion solicitada."
+}
+```
+
+---
+
+## 17) Subir archivo a Google Cloud Storage
 
 ### Resumen
 
@@ -2245,7 +2309,7 @@ Notas:
 
 ---
 
-## 17) Buscar archivo en Google Cloud Storage
+## 18) Buscar archivo en Google Cloud Storage
 
 ### Resumen
 
@@ -2291,7 +2355,7 @@ Notas:
 
 ---
 
-## 18) Eliminar archivo en Google Cloud Storage
+## 19) Eliminar archivo en Google Cloud Storage
 
 ### Resumen
 

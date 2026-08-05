@@ -1,0 +1,104 @@
+meta {
+  name: 2) Imprimir reposicion
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{host}}/gtfReplacementsServices/api/v1/replenishment-management/40038/print
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  ## Objetivo
+  Generar y descargar el comprobante PDF de una reposicion en estado enviado.
+  
+  ## Metodo y ruta
+  - Metodo: `GET`
+  - Ruta: `/api/v1/replenishment-management/{replenishmentId}/print`
+  
+  ## Pantalla Front
+  Administracion de Reposiciones -> accion Imprimir.
+  
+  ## Cuando usarlo
+  - Cuando la reposicion ya fue enviada (`ENV`/`SENT`) y se requiere comprobante.
+  
+  ## Parametros
+  - Path `replenishmentId` (obligatorio): id de la reposicion a imprimir.
+  - Body: no aplica.
+  
+  ## Reglas funcionales clave
+  - Solo se puede imprimir una reposicion en estado enviado.
+  - Si la reposicion no existe o no esta en estado enviado, backend retorna validacion funcional.
+  - En exito devuelve bytes PDF y header `Content-Disposition` para visualizacion/descarga.
+  
+  ## Prioridad recomendada de lectura en Front
+  1. Si status HTTP es `200` y `content-type` es `application/pdf`, renderizar/descargar.
+  2. Si status HTTP es `400` y `content-type` es `application/json`, mostrar `message`.
+  
+  ## Respuesta esperada
+  - Exito: body binario PDF (`application/pdf`).
+  - Error funcional: body JSON con `code` y `message`.
+  
+  ## Mapeo de campos API -> pantalla Front
+  - `message` (error funcional) -> texto de validacion a mostrar.
+  - `Content-Disposition` (exito) -> nombre sugerido del archivo.
+}
+
+example {
+  name: Escenario exitoso (PDF)
+  
+  request: {
+    url: {{host}}/gtfReplacementsServices/api/v1/replenishment-management/40036/print
+    method: GET
+    mode: none
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+        %PDF-1.4
+        ... contenido binario del comprobante ...
+      '''
+    }
+  }
+}
+
+example {
+  name: Escenario con validacion funcional
+  
+  request: {
+    url: {{host}}/gtfReplacementsServices/api/v1/replenishment-management/40036/print
+    method: GET
+    mode: none
+  }
+  
+  response: {
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: text
+      content: '''
+        {
+          "code": 200,
+          "message": "Solo se puede imprimir una reposicion en estado enviado."
+        }
+      '''
+    }
+  }
+}
