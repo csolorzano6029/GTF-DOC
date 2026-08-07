@@ -1453,6 +1453,7 @@ Notas:
 - `companyCode` y `workAreaCode` se resuelven desde el usuario autenticado (Keycloak).
 - Solo devuelve reposiciones activas (`requestState = 1`) en estado de cheque emitido (`CHE`/`ISSUED`) del local actual.
 - El backend normaliza `replenishmentDate` priorizando `lastModifiedDate` y, si no existe, `createdDate`.
+- El listado se ordena por `replenishmentDate` ascendente (primero el registro mas antiguo).
 - Para paridad de lectura de popup legacy, `replenishmentStatusName` se devuelve como `Pago emitido` cuando el estado es `CHE` o `ISSUED`.
 - Cada cabecera incluye `issuedCheckDocuments` con el desglose de documentos/solicitudes del popup legacy.
 - En `issuedCheckDocuments`, el estado visible se mapea asi: `CHE/ISSUED -> Pago emitido`, `PAG/PAID -> Pagado`, otros -> `Pago pendiente`.
@@ -1549,6 +1550,80 @@ GET /gtfReplacementsServices/api/v1/replenishment-management/issued-check
   "code": 200,
   "message": "OK",
   "data": []
+}
+```
+
+---
+
+## 8.5) Aceptar seleccion de reposiciones CHE (popup Nuevo)
+
+### Resumen
+
+- Nombre: Regularizar filas CHE seleccionadas antes de continuar con Nuevo
+- Metodo: POST
+- URL: /gtfReplacementsServices/api/v1/replenishment-management/issued-check/accept
+- URL completa sugerida: {{host}}/gtfReplacementsServices/api/v1/replenishment-management/issued-check/accept
+
+### Parametros
+
+| Tipo | Nombre                 | Requerido | Tipo dato   | Descripcion                                                         |
+| ---- | ---------------------- | --------- | ----------- | ------------------------------------------------------------------- |
+| Body | issuedCheckDocumentIds | Si        | Array<Long> | IDs seleccionados de `issuedCheckDocuments[].issuedCheckDocumentId` |
+
+Notas:
+
+- `companyCode` y `workAreaCode` se resuelven desde el usuario autenticado (Keycloak).
+- Solo se procesan filas activas y seleccionables en estado `CHE/ISSUED` del local autenticado.
+- Por cada fila procesada, el backend:
+  - marca la fila desglosada como `PAG`,
+  - registra historial de estado en `PAG`,
+  - registra movimiento financiero de ingreso (incremento de saldo efectivo).
+- Despues de procesar, la respuesta devuelve el estado de pre-check de Nuevo (`ReplenishmentNewValidationVo`).
+
+### Ejemplo de request
+
+```http
+POST /gtfReplacementsServices/api/v1/replenishment-management/issued-check/accept
+Content-Type: application/json
+
+[90001, 90011]
+```
+
+### Ejemplo de response cuando ya no quedan CHE (200)
+
+```json
+{
+  "code": 200,
+  "message": "Se ha realizado el aumento de su fondo disponible con exito.",
+  "data": {
+    "workAreaCode": 186,
+    "transactionCode": "1",
+    "transactionSelectionRequired": false,
+    "supportedTransactionCodes": ["1"],
+    "issuedCheckReplenishment": false,
+    "pendingReplenishment": false,
+    "initialFundLoadRequired": false,
+    "valid": true
+  }
+}
+```
+
+### Ejemplo de response cuando no se selecciona ninguna fila (200)
+
+```json
+{
+  "code": 200,
+  "message": "No ha seleccionado del listado la solicitud de reposicion para el incremento de su fondo disponible.",
+  "data": {
+    "workAreaCode": 186,
+    "transactionCode": "1",
+    "transactionSelectionRequired": false,
+    "supportedTransactionCodes": ["1"],
+    "issuedCheckReplenishment": true,
+    "pendingReplenishment": false,
+    "initialFundLoadRequired": false,
+    "valid": false
+  }
 }
 ```
 
@@ -2254,13 +2329,29 @@ Notas:
 
 ### Parametros
 
-| Tipo | Nombre          | Requerido | Tipo dato | Descripcion                             |
-| ---- | --------------- | --------- | --------- | --------------------------------------- |
-| Path | replenishmentId | Si        | Long      | Identificador de la reposicion a enviar |
+| Tipo | Nombre                         | Requerido | Tipo dato | Descripcion                                                        |
+| ---- | ------------------------------ | --------- | --------- | ------------------------------------------------------------------ |
+| Path | replenishmentId                | Si        | Long      | Identificador de la reposicion a enviar                            |
+| Body | checkResponsiblePersonId       | No        | Long      | Responsable del cheque a usar durante el envio                     |
+| Body | checkResponsiblePersonDocument | No        | String    | Cedula para resolver `checkResponsiblePersonId` cuando no llega id |
 
 ### Request
 
-Sin body.
+Body opcional.
+
+```json
+{
+  "checkResponsiblePersonId": 94567
+}
+```
+
+o
+
+```json
+{
+  "checkResponsiblePersonDocument": "1710034065002"
+}
+```
 
 ```http
 POST /gtfReplacementsServices/api/v1/replenishment-management/40027/send
@@ -2270,6 +2361,8 @@ POST /gtfReplacementsServices/api/v1/replenishment-management/40027/send
 
 - Solo se puede enviar una reposicion en estado pendiente.
 - Debe existir al menos una linea de detalle activa.
+- Si llega `checkResponsiblePersonId` en request, se usa para validacion de envio.
+- Si llega `checkResponsiblePersonDocument` y no llega id, backend resuelve el responsable por cedula.
 - Para Caja Chica con pago por ventanilla (`VEN`), el envio requiere `checkResponsiblePersonId` valido.
 - En envio exitoso se ejecutan efectos transaccionales del flujo legacy:
   - cambio de estado a enviado (`ENV`),
@@ -2311,6 +2404,13 @@ POST /gtfReplacementsServices/api/v1/replenishment-management/40027/send
 {
   "code": 200,
   "message": "La reposicion no puede ser enviada porque no se encontro a nombre de quien sale el cheque de la solicitud."
+}
+```
+
+```json
+{
+  "code": 200,
+  "message": "El checkResponsiblePersonId enviado no existe."
 }
 ```
 

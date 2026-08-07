@@ -1,0 +1,57 @@
+meta {
+  name: 4) Aceptar reposiciones cheque emitido (popup Nuevo)
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{host}}/gtfReplacementsServices/api/v1/replenishment-management/issued-check/accept
+  body: json
+  auth: inherit
+}
+
+body:json {
+  [
+    62173,
+    62172,
+    65959
+  ]
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  ## Objetivo
+  Regularizar filas seleccionadas en estado CHE del popup de Nuevo para continuar el flujo de creacion.
+  
+  ## Metodo y ruta
+  - Metodo: `POST`
+  - Ruta: `/api/v1/replenishment-management/issued-check/accept`
+  
+  ## Pantalla Front
+  Administracion de Reposiciones -> Boton Nuevo -> Popup de reposiciones con cheque emitido -> Boton Aceptar.
+  
+  ## Request
+  - Body: `Array<Long>` con IDs seleccionados de `issuedCheckDocuments[].issuedCheckDocumentId`.
+  - `companyCode` y `workAreaCode` se resuelven desde token.
+  
+  ## Reglas funcionales clave
+  - Solo procesa filas activas seleccionables en `CHE/ISSUED`.
+  - Por cada fila procesada:
+    - actualiza estado de la fila a `PAG`,
+    - registra historial de estado `PAG`,
+    - registra movimiento financiero de ingreso.
+  - Si no se envia seleccion valida, responde mensaje funcional de no seleccion.
+  - Retorna `ReplenishmentNewValidationVo` para que Front decida el siguiente paso del flujo Nuevo.
+  
+  ## Respuesta esperada
+  - `message` de exito cuando ya no quedan CHE en el local.
+  - `message` de validacion (`issued-check`) cuando aun quedan CHE.
+  - `data` con banderas de pre-check (`issuedCheckReplenishment`, `pendingReplenishment`, `initialFundLoadRequired`, `valid`).
+  
+  ## Hint rapido de busqueda
+  Buscar por `issued-check/accept` en la coleccion REPLACEMENTS-MANAGEMENT/VALIDAR.
+}

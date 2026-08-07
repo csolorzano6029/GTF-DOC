@@ -39,6 +39,7 @@ docs {
   - Incluye estados `CHE` y `ISSUED` del local actual.
   - `replenishmentStatusName` se normaliza a `Pago emitido`.
   - `replenishmentDate` prioriza `lastModifiedDate`; si no existe, usa `createdDate`.
+  - El listado se ordena por `replenishmentDate` ascendente (primero el registro mas antiguo).
   - Cada cabecera incluye `issuedCheckDocuments` con filas desglosadas del popup legacy.
   - En `issuedCheckDocuments`, el estado visible se mapea asi: `CHE/ISSUED -> Pago emitido`, `PAG/PAID -> Pagado`, otros -> `Pago pendiente`.
   - `issuedCheckDocuments[].selectable` es `true` solo en filas `CHE/ISSUED`.

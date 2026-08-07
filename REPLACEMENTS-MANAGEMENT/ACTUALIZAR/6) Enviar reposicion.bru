@@ -5,9 +5,15 @@ meta {
 }
 
 post {
-  url: {{host}}/gtfReplacementsServices/api/v1/replenishment-management/40036/send
-  body: none
+  url: {{host}}/gtfReplacementsServices/api/v1/replenishment-management/40052/send
+  body: json
   auth: inherit
+}
+
+body:json {
+  {
+    "checkResponsiblePersonId": 72343
+  }
 }
 
 settings {
@@ -31,11 +37,15 @@ docs {
   
   ## Parametros
   - Path `replenishmentId` (obligatorio): id de la reposicion a enviar.
-  - Body: no aplica.
+  - Body `ReplenishmentVo` (opcional): permite enviar responsable de cheque en el mismo envio.
+    - `checkResponsiblePersonId` (opcional): identificador de persona responsable del cheque.
+    - `checkResponsiblePersonDocument` (opcional): cedula para resolver `checkResponsiblePersonId` cuando no se envia id.
   
   ## Reglas funcionales clave
   - Solo se puede enviar una reposicion en estado pendiente.
   - Debe existir al menos una linea de detalle activa.
+  - Si el body incluye `checkResponsiblePersonId`, se usa ese valor para la validacion de envio.
+  - Si el body incluye `checkResponsiblePersonDocument` y no llega id, backend resuelve la persona por cedula.
   - Para Caja Chica con pago por ventanilla (`VEN`), se exige `checkResponsiblePersonId` valido.
   - En envio exitoso se cambia estado a enviado (`ENV`) y se ejecutan efectos financieros del flujo legacy:
     - registro de historial de estado,
@@ -60,6 +70,43 @@ example {
     url: {{host}}/gtfReplacementsServices/api/v1/replenishment-management/40027/send
     method: POST
     mode: none
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+        {
+          "code": 200,
+          "message": "OK",
+          "data": {
+            "replenishmentId": 40027,
+            "replenishmentStatus": "SENT",
+            "replenishmentStatusName": "Enviado"
+          }
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: Escenario exitoso enviando responsable por cedula
+  
+  request: {
+    url: {{host}}/gtfReplacementsServices/api/v1/replenishment-management/40027/send
+    method: POST
+    mode: json
+    body:json: {
+      {
+        "checkResponsiblePersonDocument": "1710034065002"
+      }
+    }
   }
   
   response: {
