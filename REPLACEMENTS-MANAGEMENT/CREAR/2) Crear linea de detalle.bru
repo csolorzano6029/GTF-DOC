@@ -5,7 +5,7 @@ meta {
 }
 
 post {
-  url: {{host}}/gtfReplacementsServices/api/v1/replenishment-management/39987/details
+  url: {{host}}/gtfReplacementsServices/api/v1/replenishment-management/40059/details
   body: json
   auth: inherit
 }
@@ -15,7 +15,7 @@ body:json {
     {
       "documentType": "FAC",
       "taxId": "1790016919001",
-      "documentNumber": "006-012-000149434",
+      "documentNumber": "{{detailDocumentNumberOne}}", 
       "documentDate": 1783684800000,
       "observation": "Detalle batch 1",
       "requestedValue": 50.0,
@@ -25,7 +25,7 @@ body:json {
     {
       "documentType": "FAC",
       "taxId": "1790016919001",
-      "documentNumber": "006-012-000149434",
+      "documentNumber": "{{detailDocumentNumberTwo}}",
       "documentDate": 1783684800000,
       "observation": "Detalle batch 2",
       "requestedValue": 49.0,
@@ -44,8 +44,8 @@ script:pre-request {
   const documentPrefix = '001-001-';
   const numericSeed = Number(String(Date.now()).slice(-8));
   
-  const firstDocumentNumber = `${documentPrefix}${String(numericSeed).padStart(8, '0')}`;
-  const secondDocumentNumber = `${documentPrefix}${String(numericSeed + 1).padStart(8, '0')}`;
+  const firstDocumentNumber = `${documentPrefix}${String(numericSeed).padStart(9, '0')}`;
+  const secondDocumentNumber = `${documentPrefix}${String(numericSeed + 1).padStart(9, '0')}`;
   
   bru.setVar('detailDocumentNumberOne', firstDocumentNumber);
   bru.setVar('detailDocumentNumberTwo', secondDocumentNumber);
