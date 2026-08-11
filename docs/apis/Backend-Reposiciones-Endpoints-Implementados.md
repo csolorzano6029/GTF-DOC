@@ -2256,17 +2256,17 @@ Notas:
       "documentNumber": "001-001-000012347",
       "documentDate": 1783684800000,
       "observation": "Detalle retencion manual",
-      "requestedValue": 1.10,
-      "vatValue": 0.00,
+      "requestedValue": 1.1,
+      "vatValue": 0.0,
       "billingConceptSequence": 29199,
       "withholdingConcepts": [
         {
           "taxTypeCode": "IVA",
-          "retainedValue": 0.10
+          "retainedValue": 0.1
         },
         {
           "taxTypeCode": "REN",
-          "retainedValue": 1.00
+          "retainedValue": 1.0
         }
       ]
     }
@@ -2276,24 +2276,24 @@ Notas:
 
 ### Mapeo de campos de request (API -> uso)
 
-| Campo | Tipo | Requerido | Uso / Regla |
-| --- | --- | --- | --- |
-| `workAreaCode` | Integer | Si | Contexto del local. Si no llega en body, se usa el del token. |
-| `transactionCode` | String | No (interno) | En create management se normaliza a `"1"` (Caja Chica). |
-| `responsiblePersonDocument` | String | Si | Se usa para resolver internamente `responsiblePersonId`. |
-| `observation` | String | Si | Observacion de cabecera. |
-| `details` | Array | Si | Lista de filas de detalle; se procesa en la misma transaccion. |
-| `details[].documentType` | String | Si | Tipo documental (ej. `FAC`, `RTM`, `RTE`). |
-| `details[].taxId` | String | Condicional | Obligatorio segun tipo documental. |
-| `details[].documentNumber` | String | Condicional | Obligatorio segun tipo documental. |
-| `details[].documentDate` | Number (epoch ms) | Si | Fecha de documento, no futura. |
-| `details[].observation` | String | No | Observacion de detalle. |
-| `details[].requestedValue` | Number | Si | Total de la fila. |
-| `details[].vatValue` | Number | Si | IVA. Para `RTM`/`RTE` se normaliza a `0`. |
-| `details[].billingConceptSequence` | Integer | Si (general) | En `RTM`, si no llega, backend usa default `29199`. |
-| `details[].withholdingConcepts` | Array | Si en `RTM`/`RTE` | Desglose de impuestos retenidos por fila. |
-| `details[].withholdingConcepts[].taxTypeCode` | String | Si en `RTM`/`RTE` | Solo permite `REN` o `IVA`. |
-| `details[].withholdingConcepts[].retainedValue` | Number | Si en `RTM`/`RTE` | Debe ser mayor a 0. |
+| Campo                                           | Tipo              | Requerido         | Uso / Regla                                                    |
+| ----------------------------------------------- | ----------------- | ----------------- | -------------------------------------------------------------- |
+| `workAreaCode`                                  | Integer           | Si                | Contexto del local. Si no llega en body, se usa el del token.  |
+| `transactionCode`                               | String            | No (interno)      | En create management se normaliza a `"1"` (Caja Chica).        |
+| `responsiblePersonDocument`                     | String            | Si                | Se usa para resolver internamente `responsiblePersonId`.       |
+| `observation`                                   | String            | Si                | Observacion de cabecera.                                       |
+| `details`                                       | Array             | Si                | Lista de filas de detalle; se procesa en la misma transaccion. |
+| `details[].documentType`                        | String            | Si                | Tipo documental (ej. `FAC`, `RTM`, `RTE`).                     |
+| `details[].taxId`                               | String            | Condicional       | Obligatorio segun tipo documental.                             |
+| `details[].documentNumber`                      | String            | Condicional       | Obligatorio segun tipo documental.                             |
+| `details[].documentDate`                        | Number (epoch ms) | Si                | Fecha de documento, no futura.                                 |
+| `details[].observation`                         | String            | No                | Observacion de detalle.                                        |
+| `details[].requestedValue`                      | Number            | Si                | Total de la fila.                                              |
+| `details[].vatValue`                            | Number            | Si                | IVA. Para `RTM`/`RTE` se normaliza a `0`.                      |
+| `details[].billingConceptSequence`              | Integer           | Si (general)      | En `RTM`, si no llega, backend usa default `29199`.            |
+| `details[].withholdingConcepts`                 | Array             | Si en `RTM`/`RTE` | Desglose de impuestos retenidos por fila.                      |
+| `details[].withholdingConcepts[].taxTypeCode`   | String            | Si en `RTM`/`RTE` | Solo permite `REN` o `IVA`.                                    |
+| `details[].withholdingConcepts[].retainedValue` | Number            | Si en `RTM`/`RTE` | Debe ser mayor a 0.                                            |
 
 Regla clave de retencion manual/electronica:
 
