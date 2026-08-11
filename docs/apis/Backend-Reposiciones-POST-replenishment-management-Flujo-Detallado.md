@@ -195,10 +195,17 @@ Que significa "actualizacion de totales de cabecera por incremento":
 | `documentDate`                                              | Si          | Requerido + no futura                           |
 | `requestedValue`                                            | Si          | Requerido + reglas de monto maximo              |
 | `vatValue`                                                  | Si          | Requerido + coherencia IVA                      |
+| `withholdingConcepts`                                       | Condicional | Obligatorio para `RTM`/`RTE`                    |
+| `withholdingConcepts[].taxTypeCode`                         | Condicional | Solo permite `REN` o `IVA`                      |
+| `withholdingConcepts[].retainedValue`                       | Condicional | Obligatorio, mayor que cero                     |
 | `taxId`                                                     | Condicional | Obligatorio para tipos FAC/FEL/RET\*            |
 | `documentNumber`                                            | Condicional | Obligatorio para tipos FAC/FEL/RET\*            |
 | `fileName`                                                  | Condicional | Obligatorio si concepto exige huella de carbono |
 | Otros campos (`saleReceipt`, `accessKey`, `quantity`, etc.) | No          | Se persisten si llegan                          |
+
+Regla adicional para retencion manual/electronica:
+
+- En detalles `RTM`/`RTE`, la suma de `withholdingConcepts[].retainedValue` debe coincidir con `requestedValue` (redondeado a 2 decimales).
 
 ## 6. Matriz de Validaciones (Orden Real)
 

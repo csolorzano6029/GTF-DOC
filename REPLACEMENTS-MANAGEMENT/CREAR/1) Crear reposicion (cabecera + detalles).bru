@@ -78,6 +78,50 @@ docs {
   ## Parametros
   - Campos de cabecera en raiz del body (mismas reglas del create de cabecera).
   - `details`: arreglo de detalle (mismas reglas del batch de detalle).
+
+  ## Mapeo de request (campo -> uso backend)
+  - `workAreaCode` -> contexto del local. Si no llega, el backend usa el del token.
+  - `transactionCode` -> en create management se normaliza a `"1"` (Caja Chica).
+  - `responsiblePersonDocument` -> documento para resolver internamente `responsiblePersonId`.
+  - `observation` -> observacion de cabecera (obligatoria).
+  - `details[]` -> filas de detalle a validar/persistir en la misma transaccion.
+  - `details[].documentType` -> tipo documental (ej. `FAC`, `RTM`, `RTE`).
+  - `details[].taxId` -> identificacion tributaria del documento (aplica por tipo).
+  - `details[].documentNumber` -> numero de comprobante (aplica por tipo).
+  - `details[].documentDate` -> fecha del documento en timestamp unix (milisegundos).
+  - `details[].observation` -> observacion por fila.
+  - `details[].requestedValue` -> total de la fila.
+  - `details[].vatValue` -> IVA de la fila. Para `RTM`/`RTE` se normaliza a `0`.
+  - `details[].billingConceptSequence` -> concepto de facturacion. En `RTM`, si no llega, el backend usa default `29199`.
+  - `details[].withholdingConcepts[]` -> requerido para detalle de retencion manual/electronica (`RTM`/`RTE`).
+  - `details[].withholdingConcepts[].taxTypeCode` -> tipo de impuesto retenido (`IVA` o `REN`).
+  - `details[].withholdingConcepts[].retainedValue` -> valor retenido por impuesto (> 0).
+
+  ## Ejemplo para retencion manual (RTM)
+  - En `RTM`, enviar `withholdingConcepts` y validar que la suma de `retainedValue` sea igual a `requestedValue` (redondeado a 2 decimales).
+
+  ```json
+  {
+    "documentType": "RTM",
+    "taxId": "1790016919001",
+    "documentNumber": "001-001-000012399",
+    "documentDate": 1783684800000,
+    "observation": "Detalle retencion manual",
+    "requestedValue": 1.10,
+    "vatValue": 0.00,
+    "billingConceptSequence": 29199,
+    "withholdingConcepts": [
+      {
+        "taxTypeCode": "IVA",
+        "retainedValue": 0.10
+      },
+      {
+        "taxTypeCode": "REN",
+        "retainedValue": 1.00
+      }
+    ]
+  }
+  ```
   
   ## Reglas funcionales clave
   - Se ejecuta en una sola transaccion.
