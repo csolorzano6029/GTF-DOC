@@ -12,9 +12,27 @@ post {
 
 body:json {
   {
-    "filters": [],
-    "page": 0,
-    "size": 15
+      "filters": [
+          {
+              "alias": null,
+              "parameterPattern": "createdDate",
+              "dataType": "Instant",
+              "parameterValue": null,
+              "parameterValues": [],
+              "selectedOption": "ra",
+              "operatorOR": false,
+              "comparatorTypeEnum": "Igual",
+              "insensitive": false,
+              "rangeBean": {
+                  "rangeStartComparatorTypeEnum": "Mayor",
+                  "rangeEndComparatorTypeEnum": "Menor",
+                  "bottomValue": 1786078800000,
+                  "topValue": 1786165199000
+              }
+          }
+      ],
+      "page": 0,
+      "size": 15
   }
 }
 
@@ -26,14 +44,14 @@ settings {
 docs {
   ## Objetivo
   Buscar reposiciones para la grilla principal con filtros y paginacion.
-
+  
   ## Metodo y ruta
   - Metodo: `POST`
   - Ruta: `/api/v1/replenishments/findByFilter`
   
   ## Pantalla Front
   Administracion de Reposiciones -> Lista de reposiciones -> Buscar.
-
+  
   ## Cuando usarlo
   - Carga inicial de pantalla.
   - Cambio de filtros.
@@ -43,7 +61,7 @@ docs {
   - Body `filters`: criterios SearchModelDTO.
   - Body `page`: pagina base 0.
   - Body `size`: tamano de pagina.
-
+  
   ## Reglas funcionales clave
   - API responde contrato estandar (`code/message/errors/data`) con HTTP 200.
   - `data` es paginado; las filas vienen en `data.content`.
@@ -53,7 +71,7 @@ docs {
   ## Valores de referencia
   - Estados: `PEN`, `ENV`, `VAL`, `PAG`, `CHE`, `COB`, `ANU`.
   - Comparador recomendado: `Igual`.
-
+  
   ## Prioridad recomendada de lectura en Front
   1. Renderizar filas desde `data.content`.
   2. Usar `data.totalElements`, `data.totalPages`, `data.number`, `data.size` para paginador.

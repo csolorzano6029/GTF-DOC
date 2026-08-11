@@ -229,15 +229,21 @@ gtf-replacements-root
 
 ```json
 {
-  "code": 0,
+  "code": 200,
   "message": "OK",
   "data": [
     {
-      "personId": "1712345678",
+      "personId": 72643,
+      "documentNumber": "1712345678",
       "fullName": "Cintia Escobar",
       "type": "PRINCIPAL"
     },
-    { "personId": "1798765432", "fullName": "Juan Pérez", "type": "SECONDARY" }
+    {
+      "personId": 72644,
+      "documentNumber": "1798765432",
+      "fullName": "Juan Pérez",
+      "type": "SECUNDARIO"
+    }
   ]
 }
 ```

@@ -2188,6 +2188,7 @@ GET /gtfReplacementsServices/api/v1/replenishments/responsibles?workAreaCode=186
   "data": [
     {
       "personId": 72643,
+      "documentNumber": "1712345678",
       "fullName": "NOMBRE RESPONSABLE",
       "type": "PRINCIPAL"
     }
@@ -2208,6 +2209,7 @@ Notas:
 
 - `companyCode` no se envia: se toma del token.
 - El endpoint se usa en el flujo de envio para poblar el selector de responsable.
+- `documentNumber` retorna la cedula/documento de identidad del responsable.
 - La clasificacion del responsable se expone en `type` (por ejemplo `PRINCIPAL` o `SECUNDARIO`).
 
 ---

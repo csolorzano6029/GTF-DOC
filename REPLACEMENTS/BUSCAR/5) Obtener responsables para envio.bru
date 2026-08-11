@@ -43,7 +43,7 @@ docs {
 
   ## Prioridad recomendada de lectura en Front
   1. Poblar selector desde `data[]`.
-  2. Mostrar `fullName` y conservar `personId` como valor seleccionado.
+  2. Mostrar `fullName` + `documentNumber` y conservar `personId` como valor seleccionado.
   3. Usar `type` para etiqueta complementaria (ejemplo: PRINCIPAL/SECUNDARIO).
   
   ## Respuesta esperada
@@ -51,6 +51,7 @@ docs {
   
   ## Mapeo de campos API -> pantalla Front
   - personId -> valor tecnico del responsable seleccionado.
+  - documentNumber -> cedula/documento de identidad visible en selector o tooltip.
   - fullName -> nombre completo visible en el selector.
   - type -> clasificacion del responsable (por ejemplo PRINCIPAL o SECUNDARIO).
 }
