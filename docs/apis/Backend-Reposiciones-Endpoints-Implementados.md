@@ -101,8 +101,8 @@ GET /gtfReplacementsServices/api/v1/replenishment-management/current-fund?workAr
 
 - Nombre: Buscar reposiciones por filtro con paginacion
 - Metodo: POST
-- URL: /gtfReplacementsServices/api/v1/replenishments/findByFilter
-- URL completa sugerida: {{host}}/gtfReplacementsServices/api/v1/replenishments/findByFilter
+- URL: /gtfReplacementsServices/api/v1/replenishments/filter
+- URL completa sugerida: {{host}}/gtfReplacementsServices/api/v1/replenishments/filter
 
 ### Parametros
 
@@ -145,6 +145,7 @@ Notas importantes:
 - `replenishmentStatus` mantiene el codigo tecnico de estado (`PEN`, `ENV`, `PAG`, etc.) y `replenishmentStatusName` expone la etiqueta legible para UI.
 - `sendAlert` expone la bandera de alerta visual legacy (`1`/`0`) para resaltar filas en la grilla.
 - `replenishmentDate` es equivalente a `createdDate` y corresponde a la fecha de reposicion usada en legacy (fechaRegistro).
+- La respuesta paginada se devuelve ordenada por `createdDate` ascendente (primero los registros mas antiguos).
 
 ### Operadores recomendados por tipo de campo
 
@@ -616,6 +617,7 @@ Notas:
 - `measurementUnitName` se resuelve desde catalogo corporativo (`CODTIPUNIMED` + `CODVALUNIMED`).
 - `billingConceptDescription` se resuelve desde concepto de area de trabajo (`SECCONARETRA`).
 - `documentTypeName` se intenta resolver desde catalogo legacy de tipos de documento (tipo 305).
+- La lista `data[]` se devuelve ordenada por `documentDate` ascendente (documentos mas antiguos primero), con desempate por `detailId` ascendente.
 - Si no existe nombre en catalogo para el codigo (`documentType`), `documentTypeName` llega en `null` y el front puede resolverlo con su propio diccionario.
 
 ---
