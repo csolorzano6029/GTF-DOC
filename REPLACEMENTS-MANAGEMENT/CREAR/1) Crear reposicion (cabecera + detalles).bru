@@ -78,7 +78,7 @@ docs {
   ## Parametros
   - Campos de cabecera en raiz del body (mismas reglas del create de cabecera).
   - `details`: arreglo de detalle (mismas reglas del batch de detalle).
-
+  
   ## Mapeo de request (campo -> uso backend)
   - `workAreaCode` -> contexto del local. Si no llega, el backend usa el del token.
   - `transactionCode` -> en create management se normaliza a `"1"` (Caja Chica).
@@ -96,10 +96,10 @@ docs {
   - `details[].withholdingConcepts[]` -> requerido para detalle de retencion manual/electronica (`RTM`/`RTE`).
   - `details[].withholdingConcepts[].taxTypeCode` -> tipo de impuesto retenido (`IVA` o `REN`).
   - `details[].withholdingConcepts[].retainedValue` -> valor retenido por impuesto (> 0).
-
+  
   ## Ejemplo para retencion manual (RTM)
   - En `RTM`, enviar `withholdingConcepts` y validar que la suma de `retainedValue` sea igual a `requestedValue` (redondeado a 2 decimales).
-
+  
   ```json
   {
     "documentType": "RTM",

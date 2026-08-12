@@ -45,7 +45,7 @@ docs {
   - `data.duplicate = true` indica documento ya registrado para la combinacion RUC + numero.
   - `data.valid = false` cuando existe duplicado.
   - `data.valid = true` cuando no existe duplicado y se puede continuar.
-  - Esta API evalua duplicidad simple; para validaciones mas amplias de fila se usa `validate-add`.
+  - Esta API evalua duplicidad simple; para validaciones mas amplias de fila se usa `POST /api/v1/replenishment-management/details/validate-add`.
 
   ## Nota importante
   Esta validacion no reemplaza la deteccion de repetidos dentro del arreglo en cargas batch de management.

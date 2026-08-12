@@ -4,9 +4,9 @@ meta {
   seq: 1
 }
 
-post {
+get {
   url: {{host}}/gtfReplacementsServices/api/v1/replenishment-management/validate-new
-  body: json
+  body: none
   auth: inherit
 }
 
@@ -20,7 +20,7 @@ docs {
   Ejecutar prevalidaciones antes de crear una nueva reposicion.
   
   ## Metodo y ruta
-  - Metodo: `POST`
+  - Metodo: `GET`
   - Ruta: `/api/v1/replenishment-management/validate-new`
   
   ## Pantalla Front
@@ -31,14 +31,15 @@ docs {
   - Al cambiar de local/area para validar restricciones operativas.
   
   ## Parametros
-  - `workAreaCode` (obligatorio).
-  - `transactionCode` (opcional; en el alcance actual se opera con `1`).
+  - No recibe `body` ni query params.
+  - `workAreaCode` y `companyCode` se resuelven desde el usuario autenticado (token).
   
   ## Reglas funcionales clave
   - `data.valid = true` habilita crear cabecera.
   - `data.pendingReplenishment = true` bloquea por reposicion pendiente existente.
   - `data.issuedCheckReplenishment = true` bloquea por cheque emitido pendiente de gestion.
   - `data.initialFundLoadRequired = true` bloquea hasta regularizar carga inicial de fondo.
+  - Si el consumo del fondo supera el porcentaje de uso configurado, bloquea con el mensaje: `La presente reposicion sobrepaso el % del fondo asignado ...`.
   - `data.transactionSelectionRequired` y `data.supportedTransactionCodes` informan soporte vigente de transaccion.
   
   ## Prioridad recomendada de lectura en Front

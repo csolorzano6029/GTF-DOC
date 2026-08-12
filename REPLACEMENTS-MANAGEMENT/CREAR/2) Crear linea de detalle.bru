@@ -69,11 +69,12 @@ docs {
   
   ## Cuando usarlo
   - Al confirmar carga de varias filas nuevas en una sola accion.
-  - Recomendado cuando Front ya prevalido cada fila con `validate-add`.
+  - Recomendado cuando Front ya prevalido cada fila con `POST /api/v1/replenishment-management/details/validate-add`.
   
   ## Parametros
   - Path `replenishmentId`.
   - Body array de lineas de detalle.
+  - `observation` es obligatorio por cada fila.
   - `documentNumber` se genera automaticamente en pre-request script con variables `detailDocumentNumberOne` y `detailDocumentNumberTwo`.
   
   ## Reglas funcionales clave

@@ -934,36 +934,30 @@ Notas:
 ### Resumen
 
 - Nombre: Validar reglas previas para habilitar nuevo flujo de reposicion
-- Metodo: POST
+- Metodo: GET
 - URL: /gtfReplacementsServices/api/v1/replenishment-management/validate-new
 - URL completa sugerida: {{host}}/gtfReplacementsServices/api/v1/replenishment-management/validate-new
 
-### Request payload
+### Request
 
-```json
-{
-  "workAreaCode": 186,
-  "transactionCode": "1"
-}
-```
+- No recibe `body` ni query params.
 
 Notas:
 
-- `companyCode` se toma del token Keycloak.
-- `workAreaCode` es obligatorio para la validacion.
-- `transactionCode` soportado: `1` (Caja Chica) y `2` (Gastos Personales).
-- Si `transactionCode` no llega, el backend aplica por default `1`.
+- `companyCode` y `workAreaCode` se toman del token Keycloak.
+- El flujo actual opera con transaccion fija de Caja Chica (`transactionCode = "1"`).
 - La respuesta incluye `transactionSelectionRequired` para indicar si front debe solicitar seleccion explicita de tipo de transaccion.
-- La respuesta incluye `supportedTransactionCodes` para poblar el selector (`["1", "2"]`).
+- La respuesta incluye `supportedTransactionCodes` para poblar el selector (`["1"]`).
 - La respuesta incluye `issuedCheckReplenishment` para reflejar condicion de cheque emitido bloqueante.
 
 Reglas de negocio aplicadas:
 
+- Si el contexto autenticado no trae `companyCode` o `workAreaCode`, retorna validacion no aprobada.
 - Si `workAreaCode` no existe para la compania, retorna validacion no aprobada.
 - Si existe reposicion en estado cheque emitido para el local, bloquea el flujo de nuevo.
-- Si `transactionCode = 1` y ya existe reposicion pendiente por local, bloquea el flujo de nuevo.
-- Si `transactionCode = 1` y no existe fondo asignado, marca que se requiere carga inicial de fondos.
-- Si `transactionCode = 2`, permite continuar aunque exista reposicion pendiente.
+- Si ya existe reposicion pendiente por local, bloquea el flujo de nuevo.
+- Si no existe fondo asignado, marca que se requiere carga inicial de fondos.
+- Si el consumo del fondo supera el porcentaje de uso configurado, bloquea con el mensaje de porcentaje de fondo.
 
 ### Response valida (200)
 
@@ -973,11 +967,11 @@ Reglas de negocio aplicadas:
   "message": "OK",
   "data": {
     "workAreaCode": 186,
-    "transactionCode": "2",
+    "transactionCode": "1",
     "transactionSelectionRequired": false,
-    "supportedTransactionCodes": ["1", "2"],
+    "supportedTransactionCodes": ["1"],
     "issuedCheckReplenishment": false,
-    "pendingReplenishment": true,
+    "pendingReplenishment": false,
     "initialFundLoadRequired": false,
     "valid": true
   }
@@ -994,7 +988,7 @@ Reglas de negocio aplicadas:
     "workAreaCode": 186,
     "transactionCode": "1",
     "transactionSelectionRequired": false,
-    "supportedTransactionCodes": ["1", "2"],
+    "supportedTransactionCodes": ["1"],
     "issuedCheckReplenishment": true,
     "pendingReplenishment": false,
     "initialFundLoadRequired": false,
@@ -1013,7 +1007,7 @@ Reglas de negocio aplicadas:
     "workAreaCode": 186,
     "transactionCode": "1",
     "transactionSelectionRequired": false,
-    "supportedTransactionCodes": ["1", "2"],
+    "supportedTransactionCodes": ["1"],
     "issuedCheckReplenishment": false,
     "pendingReplenishment": true,
     "initialFundLoadRequired": false,
@@ -1032,54 +1026,30 @@ Reglas de negocio aplicadas:
     "workAreaCode": 186,
     "transactionCode": "1",
     "transactionSelectionRequired": false,
-    "supportedTransactionCodes": ["1", "2"],
+    "supportedTransactionCodes": ["1"],
     "issuedCheckReplenishment": false,
     "pendingReplenishment": false,
     "initialFundLoadRequired": true,
-    "valid": false,
-    "fundHeader": {
-      "workAreaCode": "186",
-      "workAreaName": "EL JARDIN",
-      "assignedFund": 0.0
-    }
-  }
-}
-```
-
-### Response invalida por transactionCode no soportado (200)
-
-```json
-{
-  "code": 200,
-  "message": "El campo transactionCode enviado no es valido. Use 1 para Caja Chica o 2 para Gastos Personales.",
-  "data": {
-    "workAreaCode": 186,
-    "transactionCode": "9",
-    "transactionSelectionRequired": false,
-    "supportedTransactionCodes": ["1", "2"],
-    "issuedCheckReplenishment": false,
-    "pendingReplenishment": false,
-    "initialFundLoadRequired": false,
     "valid": false
   }
 }
 ```
 
-### Response valida cuando no se envia transactionCode (200)
+### Response invalida por porcentaje de uso del fondo (200)
 
 ```json
 {
   "code": 200,
-  "message": "OK",
+  "message": "La presente reposicion sobrepaso el 60% del fondo asignado de $200.00. Favor realice el envio de la reposicion.",
   "data": {
     "workAreaCode": 186,
     "transactionCode": "1",
-    "transactionSelectionRequired": true,
-    "supportedTransactionCodes": ["1", "2"],
+    "transactionSelectionRequired": false,
+    "supportedTransactionCodes": ["1"],
     "issuedCheckReplenishment": false,
     "pendingReplenishment": false,
     "initialFundLoadRequired": false,
-    "valid": true
+    "valid": false
   }
 }
 ```
@@ -1318,26 +1288,26 @@ Orden recomendado en front:
 
 - Nombre: Validar reglas antes de agregar fila de detalle (sin cabecera creada)
 - Metodo: POST
-- URL: /gtfReplacementsServices/api/v1/replenishments/details/validate-add
-- URL completa sugerida: {{host}}/gtfReplacementsServices/api/v1/replenishments/details/validate-add
+- URL: /gtfReplacementsServices/api/v1/replenishment-management/details/validate-add
+- URL completa sugerida: {{host}}/gtfReplacementsServices/api/v1/replenishment-management/details/validate-add
 
 ### Parametros
 
-| Tipo | Nombre  | Requerido | Tipo dato                                   | Descripcion                                                                           |
-| ---- | ------- | --------- | ------------------------------------------- | ------------------------------------------------------------------------------------- |
-| Body | request | Si        | ReplenishmentDetailDraftValidationRequestVo | Objeto con contexto minimo de cabecera (`workAreaCode`, `transactionCode`) y `detail` |
+| Tipo | Nombre  | Requerido | Tipo dato                                   | Descripcion                                                           |
+| ---- | ------- | --------- | ------------------------------------------- | --------------------------------------------------------------------- |
+| Body | request | Si        | ReplenishmentDetailDraftValidationRequestVo | Objeto con contexto minimo de cabecera (`transactionCode`) y `detail` |
 
 ### Request payload (ejemplo)
 
 ```json
 {
-  "workAreaCode": 186,
   "transactionCode": "1",
   "detail": {
     "documentType": "FAC",
     "taxId": "1790016919001",
     "documentNumber": "001-001-000012345",
     "documentDate": 1783684800000,
+    "observation": "Detalle temporal valido",
     "billingConceptSequence": 1,
     "requestedValue": 20.0,
     "vatValue": 3.0
@@ -1348,10 +1318,10 @@ Orden recomendado en front:
 
 Notas:
 
-- `workAreaCode` es obligatorio.
+- `workAreaCode` se resuelve desde el usuario autenticado (si llega en body, backend usa el de sesion).
 - `transactionCode` es opcional; si no llega se asume `"1"`.
 - Si llega `transactionCode` debe ser `"1"`.
-- En `detail` son obligatorios: `billingConceptSequence`, `documentType`, `documentDate`, `requestedValue` y `vatValue`.
+- En `detail` son obligatorios: `billingConceptSequence`, `documentType`, `documentDate`, `requestedValue`, `vatValue` y `observation`.
 - No requiere `replenishmentId`; pensado para filas temporales en UI antes de crear cabecera.
 - Valida duplicado por `companyCode + taxId + documentNumber` contra datos existentes.
 - El endpoint aplica Bean Validation de entrada (`@Valid`): errores de campos requeridos/vacios retornan HTTP 400 antes de ejecutar reglas de negocio.
@@ -1403,12 +1373,12 @@ Orden recomendado en front:
 
 Casos tipicos que devuelven 400 en este endpoint:
 
-- `workAreaCode` nulo.
 - `detail` nulo.
 - `detail.documentType` vacio.
 - `detail.documentDate` nulo.
 - `detail.requestedValue` nulo.
 - `detail.vatValue` nulo.
+- `detail.observation` vacio.
 
 ### Response invalida de negocio (200)
 
@@ -2287,7 +2257,7 @@ Notas:
 | `details[].taxId`                               | String            | Condicional       | Obligatorio segun tipo documental.                             |
 | `details[].documentNumber`                      | String            | Condicional       | Obligatorio segun tipo documental.                             |
 | `details[].documentDate`                        | Number (epoch ms) | Si                | Fecha de documento, no futura.                                 |
-| `details[].observation`                         | String            | No                | Observacion de detalle.                                        |
+| `details[].observation`                         | String            | Si                | Observacion de detalle obligatoria.                            |
 | `details[].requestedValue`                      | Number            | Si                | Total de la fila.                                              |
 | `details[].vatValue`                            | Number            | Si                | IVA. Para `RTM`/`RTE` se normaliza a `0`.                      |
 | `details[].billingConceptSequence`              | Integer           | Si (general)      | En `RTM`, si no llega, backend usa default `29199`.            |
