@@ -12,28 +12,30 @@ post {
 
 body:json {
   {
-    "responsiblePersonDocument": "1708682446",
-    "observation": "Creacion atomica cabecera + detalle",
+    "observation": "Reposicion con retencion electronica validada por XML",
+    "responsiblePersonDocument": "1312706029",
     "details": [
       {
-        "documentType": "FAC",
+        "billingConceptSequence": 29199,
+        "documentType": "RTE",
         "taxId": "1790016919001",
-        "documentNumber": "{{atomicDetailDocumentNumberOne}}",
-        "documentDate": 1783684800000,
-        "observation": "Detalle atomico 1",
-        "requestedValue": 50.0,
-        "vatValue": 6.52,
-        "billingConceptSequence": 1
-      },
-      {
-        "documentType": "FAC",
-        "taxId": "1790016919001",
-        "documentNumber": "{{atomicDetailDocumentNumberTwo}}",
-        "documentDate": 1783684800000,
-        "observation": "Detalle atomico 2",
-        "requestedValue": 49.0,
-        "vatValue": 6.39,
-        "billingConceptSequence": 1
+        "documentNumber": "001-002-000123456",
+        "documentDate": 1755648000000,
+        "observation": "Detalle RTE desde validacion XML",
+        "requestedValue": 25.00,
+        "vatValue": 0.00,
+        "saleReceipt": "001-001-000987654",
+        "accessKey": "2907202601179001691900120010020001234561234567815",
+        "withholdingConcepts": [
+          {
+            "taxTypeCode": "IVA",
+            "retainedValue": 10.00
+          },
+          {
+            "taxTypeCode": "REN",
+            "retainedValue": 15.00
+          }
+        ]
       }
     ]
   }

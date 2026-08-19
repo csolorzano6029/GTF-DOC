@@ -1,0 +1,22 @@
+meta {
+  name: 1) Anular reposición
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{host}}/gtfReplacementsServices/api/v1/replenishment-reviews/40065/cancel
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "observation": "Se anula por error en la documentación"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

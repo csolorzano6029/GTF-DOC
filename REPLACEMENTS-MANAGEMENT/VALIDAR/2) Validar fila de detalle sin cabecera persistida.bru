@@ -12,17 +12,29 @@ post {
 
 body:json {
   {
+    "currentRequestedTotal": 0.0,
     "detail": {
-      "documentType": "FAC",
-      "taxId": "1790016919001",
-      "documentNumber": "001-001-000012345",
-      "documentDate": 1783684800000,
-      "observation": "Detalle temporal",
-      "requestedValue": 20.0,
-      "vatValue": 0.1,
-      "billingConceptSequence": 29199
-    },
-    "currentRequestedTotal": 40.0
+      "billingConceptSequence": 29199,
+      "documentType": "RTE",
+      "taxId": "1799999999001",
+      "documentNumber": "001-002-990001112",
+      "documentDate": 1706745600000,
+      "observation": "Prueba RTE valida",
+      "requestedValue": 25.0,
+      "vatValue": 0.0,
+      "saleReceipt": "001-001-123456790",
+      "accessKey": "2907202601179999999900120010029900011121234567813",
+      "withholdingConcepts": [
+        {
+          "taxTypeCode": "IVA",
+          "retainedValue": 10.0
+        },
+        {
+          "taxTypeCode": "REN",
+          "retainedValue": 15.0
+        }
+      ]
+    }
   }
 }
 

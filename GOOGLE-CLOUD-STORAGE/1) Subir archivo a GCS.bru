@@ -11,9 +11,10 @@ post {
 }
 
 body:multipart-form {
-  taxId: 1790016919001
-  documentNumber: 001-001-000123456
-  file: @file(C:\Users\csolo\Downloads\imagen_2026-07-31_103531312.png) @contentType(image/png)
+  taxId: 1790016910001
+  documentNumber: 001-101-000123557
+  file: @file(C:\Users\csolo\Pictures\587268-lion-logo-wallpaper.jpg) @contentType(image/jpeg)
+  ~documentTypeCode: REN
 }
 
 settings {
@@ -31,14 +32,14 @@ docs {
   
   ## Parametros
   - Form-data: `file` (archivo a cargar)
-  - Form-data: `taxId` (identificador tributario para asociar el respaldo)
-  - Form-data: `documentNumber` (numero de documento para asociar el respaldo)
+  - Form-data: `taxId` (opcional, identificador tributario para asociar el respaldo)
+  - Form-data: `documentNumber` (opcional, numero de documento para asociar el respaldo)
+  - Form-data: `documentTypeCode` (opcional, tipo documental; por ejemplo `FAC`, `RET`, `RTE`, `REN`)
   
   ## Respuesta esperada
   - `message`: `OK`
-  - `data`: objeto con `fileName`, `fileType`, `taxId`, `documentNumber` y `url` (si la carga fue exitosa)
-
+  - `data`: objeto con `fileName`, `fileType`, `taxId`, `documentNumber`, `documentTypeCode` y `url` (si la carga fue exitosa)
+  
   ## Nota funcional
   Si la carga es exitosa, se registra un respaldo temporal activo (`status=1`) en `SMXFINANC.SFGTFTFILEBACKUP`.
-  `fileName` y `fileType` se obtienen internamente desde el archivo enviado.
 }
