@@ -12,14 +12,24 @@ post {
 
 body:json {
   {
-    "documentType": "FAC",
+    "documentType": "RTM",
     "taxId": "1103264071001",
     "documentNumber": "006-012-000149434",
     "documentDate": 1782968392000,
-    "observation": "Compra de insumos - ajuste",
-    "requestedValue": 21.00,
-    "vatValue": 2.74,
-    "billingConceptSequence": 1,
+    "observation": "Retencion manual - ajuste",
+    "requestedValue": 10.00,
+    "vatValue": null,
+    "billingConceptSequence": null,
+    "withholdingConcepts": [
+      {
+        "taxTypeCode": "REN",
+        "retainedValue": 6.00
+      },
+      {
+        "taxTypeCode": "IVA",
+        "retainedValue": 4.00
+      }
+    ],
     "fileName": "factura-001-ajustada.pdf"
   }
 }
@@ -51,6 +61,9 @@ docs {
   ## Reglas funcionales clave
   - Solo permite edicion cuando la cabecera esta en estado pendiente.
   - Backend vuelve a ejecutar validaciones funcionales de detalle antes de persistir.
+  - Para RTM/RTE, `withholdingConcepts` es obligatorio y la suma retenida debe cuadrar con `requestedValue`.
+  - Para RTM, si `billingConceptSequence` llega nulo, backend asigna el valor 29199.
+  - En RTM/RTE se normaliza `vatValue` a 0 y se sincronizan los conceptos de retencion del detalle.
   - Si la regla no se cumple, responde mensaje funcional y no guarda cambios.
 
   ## Prioridad recomendada de lectura en Front

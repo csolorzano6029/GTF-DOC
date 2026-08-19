@@ -13,26 +13,38 @@ post {
 body:json {
   [
     {
-      "billingConceptSequence": 57098,
+      "billingConceptSequence": null,
       "detailId": 768031,
       "documentDate": 1785715200000,
-      "documentNumber": null,
-      "documentType": "REN",
-      "documentTypeName": "Recibo manual",
-      "observation": "TEST",
+      "documentNumber": "006-012-000149434",
+      "documentType": "RTM",
+      "documentTypeName": "Retencion manual",
+      "observation": "Pre-check RTM",
       "requestedValue": 12.0,
-      "taxId": null,
-      "vatValue": 0.0
+      "taxId": "1103264071001",
+      "vatValue": null,
+      "withholdingConcepts": [
+        {
+          "taxTypeCode": "REN",
+          "retainedValue": 7.0
+        },
+        {
+          "taxTypeCode": "IVA",
+          "retainedValue": 5.0
+        }
+      ]
     },
     {
-        "billingConceptSequence": 57109,
+        "billingConceptSequence": 1,
         "detailId": 768032,
         "documentDate": 1785715200000,
-        "documentType": "REN",
-        "documentTypeName": "Recibo manual",
-        "observation": "TEST2",
+        "documentType": "FAC",
+        "documentTypeName": "Factura",
+        "observation": "Pre-check FAC",
+        "taxId": "1790016919001",
+        "documentNumber": "001-001-000012347",
         "requestedValue": 15.0,
-        "vatValue": 0.0
+        "vatValue": 1.96
       }
   ]
 }
@@ -66,7 +78,10 @@ docs {
   - No persiste cambios.
   - Reutiliza reglas de negocio de actualizacion de detalle.
   - Si una fila tiene error funcional, se reporta en `errors` con prefijo por indice (`Fila N:`).
-  - Si faltan campos obligatorios de request, retorna `400 Bad Request`.
+  - Para RTM/RTE, `withholdingConcepts` es obligatorio y debe cuadrar con `requestedValue` por fila.
+  - Para RTM, si `billingConceptSequence` llega nulo, backend aplica default 29199 antes de validar.
+  - La validacion de duplicados se ejecuta despues de normalizaciones documentales (ej. REN), alineada con update real.
+  - En updates parciales, validacion de `taxId/documentNumber` se evalua sobre el detalle merged (request + persistido).
   
   ## Prioridad recomendada de lectura en Front
   1. Revisar `message`.

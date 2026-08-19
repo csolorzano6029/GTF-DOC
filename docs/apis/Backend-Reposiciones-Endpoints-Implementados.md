@@ -145,7 +145,7 @@ Notas importantes:
 - `replenishmentStatus` mantiene el codigo tecnico de estado (`PEN`, `ENV`, `PAG`, etc.) y `replenishmentStatusName` expone la etiqueta legible para UI.
 - `sendAlert` expone la bandera de alerta visual legacy (`1`/`0`) para resaltar filas en la grilla.
 - `replenishmentDate` es equivalente a `createdDate` y corresponde a la fecha de reposicion usada en legacy (fechaRegistro).
-- La respuesta paginada se devuelve ordenada por `createdDate` ascendente (primero los registros mas antiguos).
+- La respuesta paginada se devuelve ordenada por `createdDate` descendente (primero los registros mas recientes).
 
 ### Operadores recomendados por tipo de campo
 
@@ -1803,6 +1803,31 @@ Notas:
 }
 ```
 
+Ejemplo para retencion manual (RTM):
+
+```json
+{
+  "documentType": "RTM",
+  "taxId": "1790016919001",
+  "documentNumber": "001-001-000099999",
+  "documentDate": 1783684800000,
+  "observation": "Ajuste de retencion manual",
+  "requestedValue": 10.0,
+  "vatValue": null,
+  "billingConceptSequence": null,
+  "withholdingConcepts": [
+    {
+      "taxTypeCode": "REN",
+      "retainedValue": 6.0
+    },
+    {
+      "taxTypeCode": "IVA",
+      "retainedValue": 4.0
+    }
+  ]
+}
+```
+
 Notas:
 
 - `companyCode` se toma del token Keycloak.
@@ -1811,6 +1836,10 @@ Notas:
 - Si cambia `taxId + documentNumber`, se valida no duplicidad por `companyCode + taxId + documentNumber`.
 - Al guardar, el backend recalcula en cabecera: `requestedTotal`, `vatTotal` y `requestedSubtotal`.
 - Los campos opcionales de detalle (`saleReceipt`, `measurementTypeCode`, `measurementValueCode`, `fileName`) se pueden actualizar en el mismo request.
+- Para `RTM` y `RTE`, `withholdingConcepts` es obligatorio y la suma de `retainedValue` debe coincidir con `requestedValue` (2 decimales).
+- Para `RTM`, si `billingConceptSequence` no llega, backend asigna `29199` por defecto.
+- Para `RTM` y `RTE`, backend normaliza `vatValue` a `0`.
+- En update de `RTM`/`RTE`, backend sincroniza conceptos de retencion: inactiva los conceptos vigentes del detalle y persiste los conceptos enviados en el request.
 
 Reglas de negocio aplicadas:
 
@@ -1907,6 +1936,9 @@ Notas:
 - Cada item debe incluir `detailId`; si falta en algun item, el lote se rechaza.
 - Si una fila falla en validacion funcional, el backend revierte el lote y no mantiene cambios parciales.
 - El endpoint reutiliza las mismas reglas de negocio de `POST /details/{detailId}` para cada fila.
+- Para filas `RTM`/`RTE`, cada item debe incluir `withholdingConcepts` con suma equivalente a `requestedValue` (2 decimales).
+- En filas `RTM`, si `billingConceptSequence` llega nulo, backend asigna `29199`.
+- En filas `RTM`/`RTE`, backend normaliza `vatValue` a `0` y sincroniza conceptos de retencion por cada detalle actualizado.
 
 ### Response exitosa (200)
 
@@ -2004,6 +2036,10 @@ Notas:
 - Reutiliza reglas de update existentes: cabecera pendiente, detalle existente, documento no duplicado y validaciones de negocio de detalle.
 - Tambien aplica validaciones de request (obligatorios) antes de entrar a negocio, pero mantiene contrato funcional `200` con `errors[]`.
 - Si una o mas filas no pasan validacion, la respuesta llega con `message` generico y `errors[]` por fila indexada (`Fila 1: ...`).
+- Para pre-check de retenciones (`RTM`/`RTE`), `withholdingConcepts` es obligatorio y debe cuadrar contra `requestedValue` por fila.
+- En filas `RTM`, si `billingConceptSequence` llega nulo, backend lo normaliza a `29199` antes de validar.
+- La validacion de duplicados se ejecuta despues de normalizaciones documentales (ej. `REN`), para mantener paridad con update real.
+- En updates parciales, validacion de obligatorios documentales (`taxId`/`documentNumber`) se evalua sobre el detalle merged (request + valor persistido).
 
 ### Response exitosa (200)
 
@@ -2500,15 +2536,21 @@ GET /gtfReplacementsServices/api/v1/replenishment-management/40027/print
 
 ### Parametros
 
-| Tipo      | Nombre | Requerido | Tipo dato | Descripcion                            |
-| --------- | ------ | --------- | --------- | -------------------------------------- |
-| Form-data | file   | Si        | File      | Archivo a subir al bucket configurado. |
+| Tipo      | Nombre         | Requerido | Tipo dato | Descripcion                                                         |
+| --------- | -------------- | --------- | --------- | ------------------------------------------------------------------- |
+| Form-data | file           | Si        | File      | Archivo a subir al bucket configurado.                              |
+| Form-data | taxId          | Si        | String    | Identificador tributario asociado al respaldo temporal del archivo. |
+| Form-data | documentNumber | Si        | String    | Numero de documento asociado al respaldo temporal del archivo.      |
 
 ### Ejemplo de request
 
 ```http
 POST /gtfReplacementsServices/api/v1/google-cloud-storage/upload-file
 Content-Type: multipart/form-data
+
+file=<binary>
+taxId=1790016919001
+documentNumber=001-001-000123456
 ```
 
 ### Ejemplo de response con data (200)
@@ -2517,7 +2559,13 @@ Content-Type: multipart/form-data
 {
   "code": 200,
   "message": "OK",
-  "data": "https://storage.googleapis.com/cf-max-dev/factura-001.pdf?..."
+  "data": {
+    "fileName": "factura-001.pdf",
+    "fileType": "pdf",
+    "taxId": "1790016919001",
+    "documentNumber": "001-001-000123456",
+    "url": "https://storage.googleapis.com/cf-max-dev/factura-001.pdf?..."
+  }
 }
 ```
 
@@ -2533,6 +2581,8 @@ Content-Type: multipart/form-data
 Notas:
 
 - La URL en `data` es firmada y temporal.
+- `fileName` y `fileType` se derivan internamente desde el archivo recibido.
+- Cuando la carga es exitosa, tambien se registra respaldo temporal en `SMXFINANC.SFGTFTFILEBACKUP` con `status=1`.
 - La clave privada de la cuenta de servicio se inyecta desde `${PRIVATE_KEY_GCS}`.
 
 ---
@@ -2564,7 +2614,10 @@ GET /gtfReplacementsServices/api/v1/google-cloud-storage/search-file?blobName=fa
 {
   "code": 200,
   "message": "OK",
-  "data": "https://storage.googleapis.com/cf-max-dev/factura-001.pdf?..."
+  "data": {
+    "fileName": "factura-001.pdf",
+    "url": "https://storage.googleapis.com/cf-max-dev/factura-001.pdf?..."
+  }
 }
 ```
 
@@ -2579,7 +2632,7 @@ GET /gtfReplacementsServices/api/v1/google-cloud-storage/search-file?blobName=fa
 
 Notas:
 
-- Si el blob no existe, la API responde `200` con `message: OK` y omite `data`.
+- Si el blob no existe, la API responde `200` con `message: OK` y `data` con mensaje funcional de no encontrado.
 
 ---
 
@@ -2610,7 +2663,7 @@ GET /gtfReplacementsServices/api/v1/google-cloud-storage/delete-file?blobName=fa
 {
   "code": 200,
   "message": "OK",
-  "data": true
+  "data": "El archivo se elimino correctamente de Google Cloud Storage: factura-001.pdf"
 }
 ```
 
@@ -2618,14 +2671,71 @@ GET /gtfReplacementsServices/api/v1/google-cloud-storage/delete-file?blobName=fa
 {
   "code": 200,
   "message": "OK",
-  "data": false
+  "data": "No se pudo eliminar el archivo en Google Cloud Storage o no existe: factura-001.pdf"
 }
 ```
 
 Notas:
 
-- `true`: el archivo fue eliminado.
-- `false`: no existia o no fue posible eliminarlo.
+- En ambos escenarios, la API mantiene `message: OK` y usa `data` para el resultado funcional.
+
+---
+
+## 20) Buscar respaldo temporal activo de archivo
+
+### Resumen
+
+- Nombre: Buscar respaldo temporal por identificadores tributarios
+- Metodo: GET
+- URL: /gtfReplacementsServices/api/v1/google-cloud-storage/backup-file
+- URL completa sugerida: {{host}}/gtfReplacementsServices/api/v1/google-cloud-storage/backup-file?taxId=1790016919001&documentNumber=001-001-000123456
+
+### Parametros
+
+| Tipo  | Nombre         | Requerido | Tipo dato | Descripcion                                                |
+| ----- | -------------- | --------- | --------- | ---------------------------------------------------------- |
+| Query | taxId          | Si        | String    | Identificador tributario asociado al respaldo del archivo. |
+| Query | documentNumber | Si        | String    | Numero de documento asociado al respaldo del archivo.      |
+
+### Ejemplo de request
+
+```http
+GET /gtfReplacementsServices/api/v1/google-cloud-storage/backup-file?taxId=1790016919001&documentNumber=001-001-000123456
+```
+
+### Ejemplo de response con data (200)
+
+```json
+{
+  "code": 200,
+  "message": "OK",
+  "data": {
+    "fileBackupId": "3fefb2f3-5ddd-46b9-bf5f-95ca4a992f8d",
+    "fileName": "factura-001.pdf",
+    "fileType": "pdf",
+    "taxId": "1790016919001",
+    "documentNumber": "001-001-000123456",
+    "status": "1",
+    "createdDate": "2026-08-18T10:00:00Z",
+    "url": "https://storage.googleapis.com/cf-max-dev/factura-001.pdf?..."
+  }
+}
+```
+
+### Ejemplo de response sin respaldo activo (200)
+
+```json
+{
+  "code": 200,
+  "message": "OK",
+  "data": "No se encontró un respaldo activo para el documento solicitado"
+}
+```
+
+Notas:
+
+- El endpoint consulta primero el respaldo activo (`status=1`) por llave de negocio (`taxId`, `documentNumber`) y luego intenta resolver URL firmada por `fileName`.
+- Si la URL no puede firmarse, el endpoint mantiene la metadata de respaldo y retorna `url: null`.
 
 ---
 

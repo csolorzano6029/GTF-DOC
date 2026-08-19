@@ -1,0 +1,39 @@
+meta {
+  name: 4) Buscar archivo respaldo temporal en GCS
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{host}}/gtfReplacementsServices/api/v1/google-cloud-storage/backup-file?taxId=1790016919001&documentNumber=001-001-000123456
+  body: none
+  auth: inherit
+}
+
+params:query {
+  taxId: 1790016919001
+  documentNumber: 001-001-000123456
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  ## Objetivo
+  Consultar el respaldo temporal activo por `taxId` y `documentNumber`, y devolver su metadata junto con URL firmada del archivo.
+  
+  ## Metodo y ruta
+  - Metodo: `GET`
+  - Ruta: `/api/v1/google-cloud-storage/backup-file`
+  
+  ## Parametros
+  - Query: `taxId` (identificador tributario)
+  - Query: `documentNumber` (numero de documento)
+  
+  ## Respuesta esperada
+  - `message`: `OK`
+  - `data`: objeto con `fileBackupId`, `fileName`, `fileType`, `taxId`, `documentNumber`, `status`, `createdDate`, `url`
+  - Si no hay respaldo activo para la llave: `data` retorna mensaje de no encontrado.
+}

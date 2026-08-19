@@ -47,7 +47,7 @@ docs {
   ## Reglas funcionales clave
   - API responde contrato estandar (`code/message/errors/data`) con HTTP 200.
   - `data` es paginado; las filas vienen en `data.content`.
-  - `data.content` se entrega ordenado por `createdDate` ascendente (registros mas antiguos primero).
+  - `data.content` se entrega ordenado por `createdDate` descendente (registros mas recientes primero).
   - El area de trabajo se toma del contexto de usuario en backend para el alcance de resultados.
   - Si no hay resultados, `data.content` llega vacio.
   

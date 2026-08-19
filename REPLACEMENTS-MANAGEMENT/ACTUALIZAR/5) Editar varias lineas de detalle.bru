@@ -13,26 +13,38 @@ post {
 body:json {
   [
     {
-      "billingConceptSequence": 57098,
+      "billingConceptSequence": null,
       "detailId": 768031,
       "documentDate": 1785715200000,
-      "documentNumber": null,
-      "documentType": "REN",
-      "documentTypeName": "Recibo manual",
-      "observation": "TEST",
+      "documentNumber": "001-001-000149434",
+      "documentType": "RTM",
+      "documentTypeName": "Retencion manual",
+      "observation": "RTM ajuste lote",
       "requestedValue": 12.0,
-      "taxId": null,
-      "vatValue": 0.0
+      "taxId": "1103264071001",
+      "vatValue": null,
+      "withholdingConcepts": [
+        {
+          "taxTypeCode": "REN",
+          "retainedValue": 7.0
+        },
+        {
+          "taxTypeCode": "IVA",
+          "retainedValue": 5.0
+        }
+      ]
     },
     {
-        "billingConceptSequence": 57109,
+        "billingConceptSequence": 1,
         "detailId": 768032,
         "documentDate": 1785715200000,
-        "documentType": "REN",
-        "documentTypeName": "Recibo manual",
-        "observation": "TEST2",
+        "documentType": "FAC",
+        "documentTypeName": "Factura",
+        "observation": "FAC ajuste lote",
+        "taxId": "1790016919001",
+        "documentNumber": "001-001-000012347",
         "requestedValue": 15.0,
-        "vatValue": 0.0
+        "vatValue": 1.96
       }
   ]
 }
@@ -64,6 +76,9 @@ docs {
   ## Reglas funcionales clave
   - Solo aplica cuando la cabecera esta en estado pendiente.
   - Reutiliza reglas de validacion del endpoint unitario por cada fila.
+  - Para RTM/RTE en update masivo, cada fila debe incluir `withholdingConcepts` y cuadrar con `requestedValue`.
+  - Para RTM, si `billingConceptSequence` llega nulo, backend asigna 29199 antes de validar/persistir.
+  - En RTM/RTE, backend normaliza `vatValue` a 0 y sincroniza conceptos de retencion por detalle.
   - Si una fila falla, el lote se revierte y no quedan cambios parciales.
   
   ## Prioridad recomendada de lectura en Front
