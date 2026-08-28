@@ -1,0 +1,34 @@
+meta {
+  name: CONSULTAR AUTORIZACION
+  type: http
+  seq: 2
+}
+
+post {
+  url: https://celcer.sri.gob.ec/comprobantes-electronicos-ws/ConsultaComprobante?wsdl
+  body: xml
+  auth: inherit
+}
+
+params:query {
+  wsdl: 
+}
+
+body:xml {
+  <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+  xmlns:ec="http://ec.gob.sri.ws.consultas">
+   <soapenv:Header/>
+   <soapenv:Body>
+   <ec:consultarEstadoAutorizacionComprobante>
+  
+  <claveAcceso>0211202401050306179800120010020000000677300995216</claveAcceso>
+   </ec:consultarEstadoAutorizacionComprobante>
+   </soapenv:Body>
+  </soapenv:Envelope>
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+  forwardAuthorizationHeader: false
+}

@@ -1,0 +1,29 @@
+meta {
+  name: CONSULTAR COMPROBANTE AUTORIZADO
+  type: http
+  seq: 1
+}
+
+post {
+  url: https://cel.sri.gob.ec/comprobantes-electronicos-ws/AutorizacionComprobantesOffline
+  body: xml
+  auth: inherit
+}
+
+body:xml {
+  <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ec="http://ec.gob.sri.ws.autorizacion">
+      <soapenv:Header/>
+      <soapenv:Body>
+          <ec:autorizacionComprobante>
+              <!--Optional:-->
+              <claveAccesoComprobante>1105202601179001691900120010240004476181105083012</claveAccesoComprobante>
+          </ec:autorizacionComprobante>
+      </soapenv:Body>
+  </soapenv:Envelope>
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+  forwardAuthorizationHeader: false
+}
