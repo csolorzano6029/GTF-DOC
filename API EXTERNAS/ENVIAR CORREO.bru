@@ -1,0 +1,54 @@
+meta {
+  name: ENVIAR CORREO
+  type: http
+  seq: 2
+}
+
+post {
+  url: https://aplpre.favorita.ec/mensajeriaWs/service/sendMail
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "to": [
+      "csolorzano6029@gmail.com"
+    ],
+    "userTo": [
+      {
+        "usuario": {
+          "userId": "FRM527"
+        }
+      }
+    ],
+    "from": "infoedoc@favorita.com.ec",
+    "fromName": "CAPACITACION PROVEEDORES",
+    "subject": "PRUEBA MASIVOS",
+    "message": "Mensaje de prueba a servidor favorita.servidores.com.ec;",
+    "xmlMessage": "",
+    "mailServerHostVO": "MASSIVE",
+    "eventVo": {
+      "eventIdVo": {
+        "companyId": 1,
+        "systemId": "EPDV",
+        "eventCode": "EPDVRPSW"
+      },
+      "subjectEvent": "Asunto",
+      "descriptionEvent": "Descripcion del evento",
+      "statusEvent": "ACT",
+      "fromEmailEvent": "infoedoc@favorita.com.ec",
+      "templateMailEvent": "",
+      "shippingTypeVo": "MAI"
+    },
+    "htmlFormat": false,
+    "omitEventDto": true,
+    "saveMessage": false
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+  forwardAuthorizationHeader: false
+}

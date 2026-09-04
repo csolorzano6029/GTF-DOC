@@ -5,7 +5,7 @@ meta {
 }
 
 post {
-  url: {{host}}/gtfReplacementsServices/api/v1/replenishment-management/40039/details/update
+  url: {{host}}/gtfReplacementsServices/api/v1/replenishment-management/40080/details/update
   body: json
   auth: inherit
 }
@@ -13,39 +13,32 @@ post {
 body:json {
   [
     {
-      "billingConceptSequence": null,
-      "detailId": 768031,
-      "documentDate": 1785715200000,
-      "documentNumber": "001-001-000149434",
+      "detailId": 768074,
       "documentType": "RTM",
-      "documentTypeName": "Retencion manual",
-      "observation": "RTM ajuste lote",
-      "requestedValue": 12.0,
-      "taxId": "1103264071001",
-      "vatValue": null,
+      "taxId": "1313445262001",
+      "documentNumber": "002-001-000000001",
+      "documentDate": 1788220800000,
+      "observation": "adasdas",
+      "measurementValueCode": null,
+      "quantity": null,
+      "fileName": null,
+      "requestedValue": 0.4,
+      "vatValue": 0,
+      "billingConceptSequence": 29199,
+      "saleReceipt": "001001000000099",
       "withholdingConcepts": [
         {
-          "taxTypeCode": "REN",
-          "retainedValue": 7.0
+          "taxTypeCode": "IVA",
+          "retainedValue": 0.1,
+          "withholdingConceptId": 379291
         },
         {
-          "taxTypeCode": "IVA",
-          "retainedValue": 5.0
+          "taxTypeCode": "REN",
+          "retainedValue": 0.3,
+          "withholdingConceptId": 379292
         }
       ]
-    },
-    {
-        "billingConceptSequence": 1,
-        "detailId": 768032,
-        "documentDate": 1785715200000,
-        "documentType": "FAC",
-        "documentTypeName": "Factura",
-        "observation": "FAC ajuste lote",
-        "taxId": "1790016919001",
-        "documentNumber": "001-001-000012347",
-        "requestedValue": 15.0,
-        "vatValue": 1.96
-      }
+    }
   ]
 }
 

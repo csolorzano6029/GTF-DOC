@@ -1,0 +1,45 @@
+meta {
+  name: 5) Subir documento con clave de acceso
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{host}}/gtfReplacementsServices/api/v1/google-cloud-storage/upload-sri-document
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "taxId": "1790016910001",
+    "documentNumber": "001-111-000123557",
+    "billingConceptSequence": 39361,,
+    "quantity": 1,
+    "measurementValueCode": "KLG"
+    "accessKey": "3108202601179001691900110010240004578383108049219"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  ## Objetivo
+  Consultar el respaldo temporal activo por `taxId` y `documentNumber`, y devolver su metadata junto con URL firmada del archivo.
+  
+  ## Metodo y ruta
+  - Metodo: `GET`
+  - Ruta: `/api/v1/google-cloud-storage/backup-file`
+  
+  ## Parametros
+  - Query: `taxId` (identificador tributario)
+  - Query: `documentNumber` (numero de documento)
+  
+  ## Respuesta esperada
+  - `message`: `OK`
+  - `data`: objeto con `fileBackupId`, `fileName`, `fileType`, `taxId`, `documentNumber`, `status`, `createdDate`, `url`
+  - Si no hay respaldo activo para la llave: `data` retorna mensaje de no encontrado.
+}
