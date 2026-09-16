@@ -22,14 +22,14 @@ settings {
 docs {
   ## Objetivo
   Consultar cabecera financiera del local para operar reposiciones.
-
+  
   ## Metodo y ruta
   - Metodo: `GET`
   - Ruta: `/api/v1/replenishment-management/current-fund`
   
   ## Pantalla Front
   Administracion de Reposiciones -> Cabecera de fondo -> Refrescar.
-
+  
   ## Cuando usarlo
   - Al abrir pantalla de administracion.
   - Antes de validar/agregar detalle.
@@ -37,12 +37,12 @@ docs {
   
   ## Parametros
   - Query `workAreaCode` (obligatorio): codigo de local/area.
-
+  
   ## Reglas funcionales clave
   - Este endpoint entrega el contexto financiero usado por reglas de negocio de detalle.
   - Los campos de umbral (`usagePercentage`, `alertPercentage`, `maxDocumentValue`) alimentan validaciones y alertas.
   - Si no hay configuracion valida para el local, la respuesta puede no habilitar operacion normal.
-
+  
   ## Prioridad recomendada de lectura en Front
   1. Mostrar `assignedFund`, `cashBalance`, `pendingPaymentAmount` en cabecera.
   2. Conservar `usagePercentage`, `alertPercentage`, `maxDocumentValue` para mensajes de validacion.

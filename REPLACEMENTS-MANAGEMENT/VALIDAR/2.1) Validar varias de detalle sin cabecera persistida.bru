@@ -1,33 +1,35 @@
 meta {
-  name: 2) Validar fila de detalle sin cabecera persistida
+  name: 2.1) Validar varias de detalle sin cabecera persistida
   type: http
-  seq: 2
+  seq: 3
 }
 
 post {
-  url: {{host}}/gtfReplacementsServices/api/v1/replenishment-management/details/validate-add
+  url: {{host}}/gtfReplacementsServices/api/v1/replenishment-management/details/validate-add-all
   body: json
   auth: inherit
 }
 
 body:json {
   {
-    "currentRequestedTotal": 0,
     "workAreaCode": 186,
-    "detail": {
-      "documentType": "FAC",
-      "taxId": "1312706029001",
-      "documentNumber": "100-100-100103111",
-      "documentDate": 1788238800000,
-      "observation": "Observación 1",
-      "measurementValueCode": null,
-      "quantity": null,
-      "fileName": null,
-      "requestedValue": 51,
-      "vatValue": 0.5,
-      "fileName": "test.png",
-      "billingConceptSequence": 39369
-    }
+    "detail": [
+      {
+        "documentType": "FAC",
+        "taxId": "1312706029001",
+        "documentNumber": "100-120-100101111",
+        "saleReceipt": null,
+        "documentDate": 1788238800000,
+        "observation": "Observación 1",
+        "measurementValueCode": null,
+        "quantity": null,
+        "fileName": null,
+        "billingConceptSequence": 63419,
+        "requestedValue": 5,
+        "vatValue": 0.5
+      },
+    ]
+    "currentRequestedTotal": 0
   }
 }
 

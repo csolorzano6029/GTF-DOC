@@ -12,9 +12,27 @@ post {
 
 body:json {
   {
-      "filters": [],
-      "page": 0,
-      "size": 15
+    "filters": [
+      {
+        "alias": null,
+        "parameterPattern": "createdDate",
+        "dataType": "Instant",
+        "parameterValue": null,
+        "parameterValues": [],
+        "selectedOption": "ra",
+        "operatorOR": false,
+        "comparatorTypeEnum": "Igual",
+        "insensitive": false,
+        "rangeBean": {
+          "rangeStartComparatorTypeEnum": "Mayor",
+          "rangeEndComparatorTypeEnum": "Menor",
+          "bottomValue": 1789448400000,
+          "topValue": 1789534799999
+        }
+      }
+    ],
+    "page": 0,
+    "size": 15
   }
 }
 
