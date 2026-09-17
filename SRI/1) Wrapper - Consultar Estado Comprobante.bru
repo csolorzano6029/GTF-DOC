@@ -1,0 +1,28 @@
+meta {
+  name: 1) Wrapper - Consultar Estado Comprobante
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{host}}/gtfReplacementsServices/api/v1/sri/query
+  body: xml
+  auth: inherit
+}
+
+body:xml {
+  <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ec="http://ec.gob.sri.ws.consultas">
+     <soapenv:Header/>
+     <soapenv:Body>
+        <ec:consultarEstadoAutorizacionComprobante>
+           <claveAcceso>0907202607019031919900120037010000111111234567819</claveAcceso>
+        </ec:consultarEstadoAutorizacionComprobante>
+     </soapenv:Body>
+  </soapenv:Envelope>
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+  forwardAuthorizationHeader: false
+}
